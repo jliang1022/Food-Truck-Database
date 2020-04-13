@@ -3,6 +3,7 @@ import hashlib
 # from flask_mysqldb import MySQL
 import MySQLdb
 import re
+import sys
 
 app = Flask(__name__, static_url_path="")
 app.secret_key = 'foodtruck'
@@ -12,7 +13,7 @@ app.secret_key = 'foodtruck'
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
 						   passwd = "Jl102298722321487",
-						   db = "foodtruck",
+						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
 
@@ -28,12 +29,12 @@ def login():
 		# Create variables for easy access
 		username = request.form['username']
 		password = request.form['password']
-		password = hashlib.md5(password.encode()).hexdigest()
 		# Check if account exists using MySQL
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s', (username, password,))
+		cursor.callproc('login', (username, password))
 		# Fetch one record and return result
 		account = cursor.fetchone()
+		print(account, file=sys.stderr)
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
@@ -55,14 +56,41 @@ def logout():
 def register():
 	# Output message if something goes wrong...
 	msg = ''
-	# Check if "username", "password" and "email" POST requests exist (user submitted form)
-	if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'confirm_password' in request.form and 'firstname' in request.form and 'lastname' in request.form:
+	# Check if POST requests exist (user submitted form)
+	if request.method == 'POST':
 		# Create variables for easy access
 		username = request.form['username']
 		password = request.form['password']
 		confirm_password = request.form['confirm_password']
 		firstname = request.form['firstname']
 		lastname = request.form['lastname']
+		email = request.form['email']
+		balance = request.form['balance']
+
+		if balance:
+			try:
+				float(balance)
+			except ValueError:
+				msg = 'Balance must be a positive decimal number!'
+				return render_template('register.html', msg=msg)
+		else:
+			balance = None
+
+		if email:
+			if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+				msg = 'Invalid email address!'
+				return render_template('register.html', msg=msg)
+			if 'role' in request.form:
+				role = request.form['role']
+			else:
+				role = None
+		else:
+			email = None
+			role = None
+
+		if not balance and not (email and role):
+			msg = 'Please fill out balance (positive decimal) and/or email and select a role!'
+			return render_template('register.html', msg=msg)
 
 	# Check if account exists using MySQL
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
@@ -71,75 +99,21 @@ def register():
 		# If account exists show error and validation checks
 		if account:
 			msg = 'Account already exists!'
+			return render_template('register.html', msg=msg)
 		elif not re.match(r'[A-Za-z0-9]+', username):
 			msg = 'Username must contain only characters and numbers!'
+			return render_template('register.html', msg=msg)
 		elif len(password) < 8:
 			msg = 'Please choose a password length of at least 8!'
+			return render_template('register.html', msg=msg)
 		elif password != confirm_password:
 			msg = 'Passwords do not match!'
-		elif not username or not password or not confirm_password or not firstname or not lastname:
-			msg = 'Please fill out the form!'
-		elif 'balance' in request.form:
-			balance = request.form['balance']
-			# Account doesnt exists and the form data is valid, now insert new account into accounts table
-			try:
-				float(balance)
-			except ValueError:
-				msg = 'Balance must be a postiive decimal number!'
-			if msg == '':
-				if float(balance) > 0:
-					password = hashlib.md5(password.encode()).hexdigest()
-					cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-					cursor.execute('INSERT INTO customer VALUES(%s, %s, NULL)', (username, balance,))
-					db_connection.commit()
-					msg = 'You have successfully registered!'
-		elif 'email' in request.form:
-			email = request.form['email']
-			if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-				msg = 'Invalid email address!'
-			elif role:
-				role = request.form['role']
-				password = hashlib.md5(password.encode()).hexdigest()
-				cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-				cursor.execute('INSERT INTO employee VALUES(%s, %s)', (username, email))
-				if role == 'admin':
-					cursor.execute('INSERT INTO admin VALUES(%s, %s)', (username, email))
-				elif role == 'manager':
-					cursor.execute('INSERT INTO manager VALUES(%s, %s)', (username, email))
-				elif role == 'staff':
-					cursor.execute('INSERT INTO staff VALUES(%s, %s, NULL)', (username, email))
-				db_connection.commit()
-				msg = 'You have successfully registered!'
-			else:
-				msg = 'Please select a role!'
-		elif 'balance' in request.form and 'email' in request.form:
-			balance = request.form['balance']
-			email = request.form['email']
-			try:
-				float(balance)
-			except ValueError:
-				msg = 'Balance must be a postive decimal number!'
-				if msg == '':
-					if float(balance) > 0:
-						if role:
-							role = request.form['role']
-							password = hashlib.md5(password.encode()).hexdigest()
-							cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-							cursor.execute('INSERT INTO customer VALUES(%s, %s, NULL)', (username, balance,))
-							cursor.execute('INSERT INTO employee VALUES(%s, %s)', (username, email))
-							if role == 'admin':
-								cursor.execute('INSERT INTO admin VALUES(%s, %s)', (username, email))
-							elif role == 'manager':
-								cursor.execute('INSERT INTO manager VALUES(%s, %s)', (username, email))
-							elif role == 'staff':
-								cursor.execute('INSERT INTO staff VALUES(%s, %s, NULL)', (username, email))
-							db_connection.commit()
-							msg = 'You have successfully registered!'
-						else:
-							msg = 'Please select a role!'
-		else:
-			msg = 'Please fill out balance (positve decimal) and/or email!'
+			return render_template('register.html', msg=msg)
 
+		cursor.callproc('register', (username, email, firstname, lastname, password, balance, role))
+		db_connection.commit()
+		cursor.close()
+		msg = 'You have successfully registered!'
 	return render_template('register.html', msg=msg)
 
 if __name__ == '__main__':
