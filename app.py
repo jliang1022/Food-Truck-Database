@@ -142,6 +142,7 @@ def register():
 
 	return render_template('register.html', msg=msg)
 
+# might not need get ??
 @app.route('/createFood', methods=['GET', 'POST'])
 def createFood():
 	# db_config = read_db_config()
@@ -153,6 +154,8 @@ def createFood():
 		print("PRINTING PLS")
 		print(args)
 		cursor.callproc('ad_create_food', args)
+		db_connection.commit()
+
 
 	return render_template('createFood.html')
 
