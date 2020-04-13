@@ -5,14 +5,14 @@ import MySQLdb
 import re
 
 app = Flask(__name__, static_url_path="")
-app.secret_key = 'foodtruck'
+app.secret_key = 'cs4400spring2020'
 # mysql = MySQL(app)
 
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
-						   passwd = "Jl102298722321487",
-						   db = "foodtruck",
+						   passwd = "",
+						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
 
@@ -141,6 +141,20 @@ def register():
 			msg = 'Please fill out balance (positve decimal) and/or email!'
 
 	return render_template('register.html', msg=msg)
+
+@app.route('/createFood', methods=['GET', 'POST'])
+def createFood():
+	# db_config = read_db_config()
+	if request.method == 'POST':
+		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+		# cursor = conn.cursor()
+		args = []
+		args.append(request.form["foodName"])
+		print("PRINTING PLS")
+		print(args)
+		cursor.callproc('ad_create_food', args)
+
+	return render_template('createFood.html')
 
 if __name__ == '__main__':
 	app.run(debug=True)
