@@ -145,18 +145,18 @@ def register():
 # might not need get ??
 @app.route('/createFood', methods=['GET', 'POST'])
 def createFood():
-	# db_config = read_db_config()
 	if request.method == 'POST':
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-		# cursor = conn.cursor()
-		args = []
-		args.append(request.form["foodName"])
-		print("PRINTING PLS")
-		print(args)
-		cursor.callproc('ad_create_food', args)
-		db_connection.commit()
-
-
+		cursor.execute("SELECT * FROM Food WHERE foodName =%s", [request.form["foodName"]])
+		food = cursor.fetchone()
+		if food is None:
+			args = []
+			args.append(request.form["foodName"])
+			cursor.callproc('ad_create_food', args)
+			db_connection.commit()
+		else:
+			error = "Food already exists."
+			return render_template('createFood.html', msg=error)
 	return render_template('createFood.html')
 
 if __name__ == '__main__':
