@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <title>Register</title>
+	    <meta charset="utf-8">
+		    <title>GT Food Truck</title>
+		    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+	</head>
+	<body>
+		<div class="register">
+			<h1>Register</h1>
+			<div class="links">
+				<a href="{{ url_for('login') }}">Login</a>
+				<a href="{{ url_for('register') }}" class="active">Register</a>
+			</div>
+			<form action="{{ url_for('register') }}" method="post" autocomplete="off">
+				<label for="username">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name="username" placeholder="Username" id="username" required>
+				<label for="password">
+					<i class="fas fa-lock"></i>
+				</label>
+				<input type="password" name="password" placeholder="Password" id="password" required>
+				<label for="confirm_password">
+					<i class="fas fa-lock"></i>
+				</label>
+				<input type="password" name="confirm_password" placeholder="Confirm Password" id="confirm_password" required>
+				<label for="email">
+					<i class="fas fa-envelope"></i>
+				</label>
+				<input type="email" name="email" placeholder="Email" id="email">
+				<label for="firstname">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name ="firstname" placeholder="First Name" id="firstname" required>
+				<label for="lastname">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name ="lastname" placeholder="Last Name" id="lastname" required>
+				<label for="balance">
+					<i class="fas fa-money-check-alt"></i>
+				</label>
+				<input type="text" name ="balance" placeholder="Balance" id="balance">
+				<label for="role">
+					<i class="fas fa-user-tag"></i>
+				</label>
+				<label for="admin">Admin
+					<input type="radio" name ="role" id="admin" value="admin">
+				</label>
+				
+				<label for="manager">Manager
+					<input type="radio" name ="role" id="manager" value="manager">
+				</label>
+				
+				<label for="staff">Staff
+					<input type="radio" name ="role" id="staff" value="staff">
+				</label>
+				<div class="msg">{{ msg }}</div>
+				<input type="submit" value="Register">
+			</form>
+		</div>
+	</body>
+</html>
