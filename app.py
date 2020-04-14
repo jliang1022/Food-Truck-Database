@@ -33,14 +33,19 @@ def login():
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
 		cursor.callproc('login', (username, password))
 		# Fetch one record and return result
+		db_connection.commit()
+		
+		cursor.execute('SELECT * FROM login_result')
 		account = cursor.fetchone()
 		print(account, file=sys.stderr)
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
 			session['loggedin'] = True
+			session['username'] = account['username']
+			session['userType'] = account['userType']
 			# Redirect to home page
-			return 'Logged in successfully!'
+			return redirect(url_for('home'))
 		else:
 			# Account doesnt exist or username/password incorrect
 			msg = 'Incorrect username/password!'
@@ -115,6 +120,15 @@ def register():
 		cursor.close()
 		msg = 'You have successfully registered!'
 	return render_template('register.html', msg=msg)
+
+@app.route('/home')
+def home():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('home.html', username=session['username'], userType=session['userType'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
 	app.run(debug=True)
