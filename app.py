@@ -11,7 +11,7 @@ app.secret_key = 'cs4400spring2020'
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
-						   passwd = "",
+						   passwd = "cloud1515",
 						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
@@ -145,6 +145,7 @@ def register():
 # might not need get ??
 @app.route('/createFood', methods=['GET', 'POST'])
 def createFood():
+	msg = ''
 	if request.method == 'POST':
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
 		cursor.execute("SELECT * FROM Food WHERE foodName =%s", [request.form["foodName"]])
@@ -155,9 +156,104 @@ def createFood():
 			cursor.callproc('ad_create_food', args)
 			db_connection.commit()
 		else:
-			error = "Food already exists."
-			return render_template('createFood.html', msg=error)
-	return render_template('createFood.html')
+			msg = "Food already exists."
+		cursor.close()
+	return render_template('createFood.html', msg=msg)
+
+@app.route('/manageFood', methods=['GET', 'POST'])
+def manageFood():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute("SELECT foodName FROM MenuItem")
+	menuItems = [item['foodName'] for item in cursor.fetchall()]
+
+	cursor.execute("select foodName, sum(purchaseQuantity) from OrderDetail group by foodName")
+	purchaseQuantity = cursor.fetchall()
+	purchaseQuantityDict = {}
+	for item in purchaseQuantity:
+		purchaseQuantityDict[item['foodName']] = int(item['sum(purchaseQuantity)'])
+
+	cursor.execute("SELECT foodName FROM Food")
+	foods = cursor.fetchall()
+	for food in foods:
+		itemCount = 0
+		if food['foodName'] in purchaseQuantityDict.keys():
+			itemCount = purchaseQuantityDict[food['foodName']]
+		food['menuCount'] = menuItems.count(food['foodName'])
+		food['purchaseCount'] = itemCount
+
+	if request.method == "POST":
+		print(request.form)
+		#filter
+		if "filter" in request.form:
+			try:
+				args = [request.form["filterFood"], None, None]
+				cursor.callproc('ad_filter_food', args)
+				db_connection.commit()
+				cursor.execute('SELECT * FROM ad_filter_food_result')
+				filtered = cursor.fetchall()
+				return render_template('manageFood.html', allFoods=foods, items=filtered)
+			except:
+				msg = 'Pick a food to filter by.'
+				return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
+
+		#sorting
+		if "sortNameASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "name", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortNameDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "name", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortMenuCountASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "menuCount", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortMenuCountDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "menuCount", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortPurchCountASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "purchaseCount", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortPurchCountDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "purchaseCount", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		# delete food
+		if "delete" in request.form:
+			try:
+				args = []
+				args.append(request.form["food"])
+				cursor.callproc('ad_delete_food', args)
+				db_connection.commit()
+			except:
+				msg = 'Cannot delete food.'
+				return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
+
+	print(request.form)
+	cursor.close()
+	return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
 
 if __name__ == '__main__':
 	app.run(debug=True)

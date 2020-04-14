@@ -9,43 +9,64 @@ body {
     background-color: #435165;
     margin: 0;
 }
-.login, .register, .createFood{
+
+.login,
+.register,
+.main {
     width: 400px;
     background-color: #ffffff;
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
     margin: 100px auto;
 }
-.login h1, .register h1, .createFood h1{
+
+.manageFoodMain {
+    width: 550px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+}
+
+.login h1,
+.register h1
+.h1main {
     text-align: center;
     color: #5b6574;
     font-size: 24px;
     padding: 20px 0 20px 0;
     border-bottom: 1px solid #dee0e4;
 }
-.login .links, .register .links .createFood{
+.login .links,
+.register .links {
     display: flex;
     padding: 0 15px;
 }
-.login .links a, .register .links a {
+.login .links a,
+.register .links a {
     color: #adb2ba;
     text-decoration: none;
     display: inline-flex;
     padding: 0 10px 10px 10px;
     font-weight: bold;
 }
-.login .links a:hover, .register .links a:hover {
+.login .links a:hover,
+.register .links a:hover {
     color: #9da3ac;
 }
-.login .links a.active, .register .links a.active {
+.login .links a.active,
+.register .links a.active {
     border-bottom: 3px solid #3274d6;
     color: #3274d6;
 }
-.login form, .register form, .createFood form{
+.login form,
+.register form,
+.createFood form,
+.manageFood form{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     padding-top: 20px;
 }
+
 .login form label,
 .register form label[for='username'],
 .register form label[for='password'],
@@ -94,7 +115,10 @@ body {
     vertical-align: middle;
 }
 
-.login form input[type="submit"], .register input[type="submit"], .createFood  input[type="submit"]{
+.login form input[type="submit"],
+.register input[type="submit"],
+.createFood input[type="submit"],
+.manageFood input[type="submit"] {
     width: 100%;
     padding: 15px;
     margin-top: 20px;
@@ -105,7 +129,9 @@ body {
     color: #ffffff;
     transition: background-color 0.2s;
 }
-.login form input[type="submit"]:hover, .register input[type="submit"]:hover, .createFood  input[type="submit"]:hover {
+.login form input[type="submit"]:hover,
+.register input[type="submit"]:hover,
+.createFood  input[type="submit"]:hover {
     background-color: #2868c7;
     transition: background-color 0.2s;
 }
@@ -116,5 +142,23 @@ body {
     border: 1px solid #000000;
     margin-bottom: 20px;
     padding: 0 15px;
+}
 
+.msg {
+    color: #FF0000;
+}
+
+.manageFoodTable {
+    border-collapse: collapse;
+    border: 1px solid #000;
+}
+
+.manageFoodTable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+}
+
+.manageFoodTable td{
+    border:1px solid #000000;
 }
