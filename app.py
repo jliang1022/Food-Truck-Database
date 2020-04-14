@@ -132,36 +132,68 @@ def home():
 @app.route('/manage_building_station', methods=['GET', 'POST'])
 def manage_building_station():
 	msg = ''
+	# Drop-down menus
 	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
 	cursor.execute('SELECT buildingName from building')
 	buildings = cursor.fetchall()
 	cursor.execute('SELECT stationName from station')
 	stations = cursor.fetchall()
-	if request.method == 'POST':
-		building_tag = request.form['building_tag']
-		min_capacity = request.form['min_capacity']
-		max_capacity = request.form['max_capacity']
-		if 'building_name' in request.form:
-			building_name = request.form['building_name']
-		else:
-			building_name = ''
-		if 'station_name' in request.form:
-			station_name = request.form['station_name']
-		else:
-			station_name = ''
-		if min_capacity == '':
-			min_capacity = None
-		if max_capacity == '':
-			max_capacity = None
-		cursor.callproc('ad_filter_building_station', (building_name, building_tag, station_name, min_capacity, max_capacity))
-		db_connection.commit()
-		cursor.execute('SELECT * FROM ad_filter_building_station_result')
-		result = cursor.fetchall()
-		print(result, file=sys.stderr)
-		return render_template('manage_building_station.html', msg=msg, result=result, buildings=buildings, stations = stations)
 
+	if request.method == 'POST':
+		# Filters
+		if 'filter' in request.form:
+			building_tag = request.form['building_tag']
+			min_capacity = request.form['min_capacity']
+			max_capacity = request.form['max_capacity']
+			if 'building_name' in request.form:
+				building_name = request.form['building_name']
+			else:
+				building_name = ''
+			if 'station_name' in request.form:
+				station_name = request.form['station_name']
+			else:
+				station_name = ''
+			if min_capacity == '':
+				min_capacity = None
+			if max_capacity == '':
+				max_capacity = None
+			cursor.callproc('ad_filter_building_station', (building_name, building_tag, station_name, min_capacity, max_capacity))
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_building_station_result')
+			result = cursor.fetchall()
+			return render_template('manage_building_station.html', msg=msg, result=result, buildings=buildings, stations=stations)
+
+		# Delete buttons
+		if 'building_select' in request.form and 'delete_building' in request.form:
+			building_select = request.form['building_select']
+			cursor.callproc('ad_delete_building', (building_select))
+			db_connection.commit()
+			msg = 'Building deleted!'
+		elif 'building_select' in request.form and 'delete_station' in request.form:
+			building_select = request.form['building_select']
+			cursor.callproc('ad_delete_station', (building_select))
+			db_connection.commit()
+			msg = 'Station deleted!'
+		elif 'delete_building' in request.form or 'delete_station' in request.form:
+			msg = 'Select a building or station to delete.'
+
+		# Update buttons
+		if 'building_select' in request.form and 'update_building' in request.form:
+			building_select = request.form['building_select']
+			cursor.execute('SELECT description FROM building WHERE buildingName = %s', (building_select))
+			description = cursor.fetchone()
+			cursor.execute('SELECT tag FROM buildingtag WHERE buildingName = %s', (building_select))
+			tag = cursor.fetchone()
+			return redirect(url_for('update_building'))
+		if 'building_select' in request.form and 'update_station' in request.form:
+			building_select = request.form['building_select']
+			cursor.execute('SELECT stationName FROM station WHERE buildingName = %s', (building_select))
+			stationName = cursor.fetchone()
+			cursor.execute('SELECT capacity FROM station WHERE buildingName = %s', (building_select))
+			capacity = cursor.fetchone()
+			return redirect(url_for('update_station'))
 	
-	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations = stations)
+	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
 
 if __name__ == '__main__':
 	app.run(debug=True)

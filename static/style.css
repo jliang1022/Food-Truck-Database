@@ -21,6 +21,7 @@ body {
     background-color: #ffffff;
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
     margin: 100px auto;
+    padding: 20px;
 }
 
 .login h1, .register h1, .home h1, .manage_building_station h1 {
@@ -148,7 +149,7 @@ body {
     padding: 10px;
     display: inline-grid;
 }
-a.button {
+a.button, .manage_building_station form input[type="submit"] {
     background-color: #3274d6; /* Green */
     border: none;
     color: white;
@@ -158,6 +159,8 @@ a.button {
     display: inline-block;
     font-size: 16px;
     border-radius: 8px;
-    margin-left: 250px;
+    margin-right: 100px;
+    margin-left: 100px;
     margin-bottom: 20px;
+    margin-top: 20px;
 }

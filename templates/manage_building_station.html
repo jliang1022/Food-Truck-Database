@@ -42,29 +42,44 @@
 						<input type="text" name="max_capacity" placeholder="Max" id="max_capacity">
 					</label>
 				</div>
-				<input type="submit" value="Filter">
+				<br>
+				<input type="submit" name="filter" value="Filter">
+				<div style="text-align: -webkit-center; padding: 20px">
+					<table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+						<tr>
+							<th>Building Name</th>
+							<th>Tags</th>
+							<th>Station Name</th>
+							<th>Capacity</th>
+							<th>Food Truck Names</th>
+						</tr>
+						{% for item in result %}
+						    <tr>
+						    {% for k, v in item.items() %}
+						    	{% if k == 'buildingName' %}
+						    		<td style="word-break: break-word"> 
+						    			<input type="radio" name ="building_select" id="building_select" value="{{ v }}">
+						    			{{v}} 
+						    		</td>
+						    	{% else %}
+						    		<td style="word-break: break-word"> {{v}} </td>
+						    	{% endif %}
+		
+						    {% endfor %}
+						    </tr>
+						{% endfor %}
+					</table>
+				</div>
+				<a href="{{ url_for('home') }}" class="button">Back</a>
+				<a href="{{ url_for('home') }}" class="button">Create Building</a>
+				<a href="{{ url_for('home') }}" class="button">Create Station</a>
+				<input type="submit"  name="update_building" value="Update Building">
+				<input type="submit" name="update_station" value="Update Station">
+				<input type="submit" name="delete_building" value="Delete Building">
+				<input type="submit" name="delete_station" value="Delete Station">
+				<br>
+				<div class="msg" style="padding: 10px">{{ msg }}</div>
 			</form>
-			<div style="text-align: -webkit-center; padding: 20px">
-				<table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto;">
-					<tr>
-						<th>Building Name</th>
-						<th>Tags</th>
-						<th>Station Name</th>
-						<th>Capacity</th>
-						<th>Food Truck Names</th>
-					</tr>
-					{% for item in result %}
-					    <tr>
-					    {% for k, v in item.items() %}
-					    		<td style="word-break: break-word"> {{v}} </td>
-					    {% endfor %}
-					    </tr>
-					{% endfor %}
-				</table>
-			</div>
-			<a href="{{ url_for('home') }}" class="button">Back</a>
-			<a href="{{ url_for('home') }}" class="button">Create Building</a>
-			<a href="{{ url_for('home') }}" class="button">Create Station</a>
 		</div>
 	</body>
 </html>
