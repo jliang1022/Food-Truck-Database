@@ -15,14 +15,22 @@ body {
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
     margin: 100px auto;
 }
-.login h1, .register h1, .home h1 {
+
+.manage_building_station {
+    width: 1000px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+}
+
+.login h1, .register h1, .home h1, .manage_building_station h1 {
     text-align: center;
     color: #5b6574;
     font-size: 24px;
     padding: 20px 0 20px 0;
     border-bottom: 1px solid #dee0e4;
 }
-.login .links, .register .links {
+.login .links, .register .links{
     display: flex;
     padding: 0 15px;
 }
@@ -120,4 +128,36 @@ body {
     font-weight: bold;
     color: #ffffff;
     transition: background-color 0.2s;
+}
+.manage_building_station form {
+    text-align: center;
+}
+.manage_building_station form input[type="submit"] {
+    display: block;
+    margin: auto;
+}
+
+.manage_building_station form div {
+    display: inline;
+}
+.manage_building_station form label select, .manage_building_station form label input {
+    width: 120px;
+    margin-top: 10px;
+}
+.manage_building_station form label {
+    padding: 10px;
+    display: inline-grid;
+}
+a.button {
+    background-color: #3274d6; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-left: 250px;
+    margin-bottom: 20px;
 }

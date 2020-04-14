@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Manage Building & Station</title>
+		<meta charset="utf-8">
+			<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	</head>
+	<body>
+		<div class="manage_building_station">
+			<h1>Manage Building & Station</h1>
+			<form action="{{ url_for('manage_building_station') }}" method="post" autocomplete="off">
+				<div class="building_filter">
+					<label for="building_name">Building Name
+						<select name="building_name" method="GET" action="/manage_building_station">
+							<option value = '' selected="selected"></option>
+							{% for building in buildings %}
+								<option value="{{ building['buildingName'] }}">{{ building['buildingName'] }}</option>
+							{% endfor %}
+						</select>
+					</label>
+				</div>
+				<div class="tag_filter">
+					<label for="tag">Tag
+						<input type="text" name="building_tag" placeholder="Tag" id="building_tag">
+					</label>
+				</div>
+				<div class="station_filter">
+					<label for="station_name">Station Name
+						<select name="station_name" method="GET" action="/manage_building_station">
+							<option value = '' selected="selected"></option>
+							{% for station in stations %}
+								<option value="{{ station['stationName'] }}">{{ station['stationName'] }}</option>
+							{% endfor %}
+						</select>
+					</label>
+				</div>
+				<div class="capacity_filter">
+					<label for="capacity">Capacity
+						<input type="text" name="min_capacity" placeholder="Min" id="min_capacity">
+						<input type="text" name="max_capacity" placeholder="Max" id="max_capacity">
+					</label>
+				</div>
+				<input type="submit" value="Filter">
+			</form>
+			<div style="text-align: -webkit-center; padding: 20px">
+				<table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto;">
+					<tr>
+						<th>Building Name</th>
+						<th>Tags</th>
+						<th>Station Name</th>
+						<th>Capacity</th>
+						<th>Food Truck Names</th>
+					</tr>
+					{% for item in result %}
+					    <tr>
+					    {% for k, v in item.items() %}
+					    		<td style="word-break: break-word"> {{v}} </td>
+					    {% endfor %}
+					    </tr>
+					{% endfor %}
+				</table>
+			</div>
+			<a href="{{ url_for('home') }}" class="button">Back</a>
+			<a href="{{ url_for('home') }}" class="button">Create Building</a>
+			<a href="{{ url_for('home') }}" class="button">Create Station</a>
+		</div>
+	</body>
+</html>

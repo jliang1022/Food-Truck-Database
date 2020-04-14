@@ -16,7 +16,9 @@
             <input type="button" value="View Current Information" class="Customer">
             <input type="button" value="Manage Food Truck" class="Manager">
             <input type="button" value="View Food Truck Summary" class="Manager">
-            <input type="button" value="Manage Building & Station" class="Admin">
+            <a href="{{ url_for('manage_building_station') }}">
+            	<input type="button" value="Manage Building & Station" class="Admin">
+            </a>
             <input type="button" value="Manage Food" class="Admin">
 		</div>
 		<script type="text/javascript">

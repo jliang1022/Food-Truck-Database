@@ -37,7 +37,6 @@ def login():
 		
 		cursor.execute('SELECT * FROM login_result')
 		account = cursor.fetchone()
-		print(account, file=sys.stderr)
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
@@ -129,6 +128,40 @@ def home():
         return render_template('home.html', username=session['username'], userType=session['userType'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
+
+@app.route('/manage_building_station', methods=['GET', 'POST'])
+def manage_building_station():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT buildingName from building')
+	buildings = cursor.fetchall()
+	cursor.execute('SELECT stationName from station')
+	stations = cursor.fetchall()
+	if request.method == 'POST':
+		building_tag = request.form['building_tag']
+		min_capacity = request.form['min_capacity']
+		max_capacity = request.form['max_capacity']
+		if 'building_name' in request.form:
+			building_name = request.form['building_name']
+		else:
+			building_name = ''
+		if 'station_name' in request.form:
+			station_name = request.form['station_name']
+		else:
+			station_name = ''
+		if min_capacity == '':
+			min_capacity = None
+		if max_capacity == '':
+			max_capacity = None
+		cursor.callproc('ad_filter_building_station', (building_name, building_tag, station_name, min_capacity, max_capacity))
+		db_connection.commit()
+		cursor.execute('SELECT * FROM ad_filter_building_station_result')
+		result = cursor.fetchall()
+		print(result, file=sys.stderr)
+		return render_template('manage_building_station.html', msg=msg, result=result, buildings=buildings, stations = stations)
+
+	
+	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations = stations)
 
 if __name__ == '__main__':
 	app.run(debug=True)
