@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Manage Food</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+  </head>
+
+  <body>
+    <div class="manageFood manageFoodMain">
+      <h1 class="h1main">Manage Food</h1>
+      <form action="{{ url_for('manageFood') }}" method="post">
+
+      <!-- need to change to homescreen !!!!!! -->
+        <a href="{{ url_for('manageFood') }}" class="active">Back</a>
+        <!-- filter food -->
+        <label for="foodName">Name:
+          <select name="filterFood">
+            <option selected disabled hidden style='display: none' value=''></option>
+            {% for item in allFoods %}
+              <option value="{{ item.foodName }}">{{ item.foodName }}</option>
+            {% endfor %}
+          </select>
+          <input type="submit" name="filter" value="Filter">
+        </label>
+
+        <table class="manageFoodTable" border="1">
+          <tr>
+            <th>Name
+              <button name="sortNameASC" class="btn"><i class="fas fa-caret-up"></i></button>
+              <button name="sortNameDESC" class="btn"><i class="fas fa-caret-down"></i></button>
+            </th>
+            <th>Menu Count
+              <button name="sortMenuCountASC" class="btn"><i class="fas fa-caret-up"></i></button>
+              <button name="sortMenuCountDESC" class="btn"><i class="fas fa-caret-down"></i></button>
+            </th>
+            <th>Purchase Count
+              <button name="sortPurchCountASC" class="btn"><i class="fas fa-caret-up"></i></button>
+              <button name="sortPurchCountDESC" class="btn"><i class="fas fa-caret-down"></i></button>
+            </th>
+          </tr>
+          {% for item in items %}
+            <tr>
+              <td>
+                <input type="radio" name="food" value="{{ item.foodName }}">
+                <label for="{{ item.foodName }}">{{ item.foodName }}</label><br>
+              </td>
+              <td align="center">{{ item.menuCount }}</td>
+              <td align="center">{{ item.purchaseCount }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+          <div class="msg">{{ msg }}</div>
+          <input type="submit" name="delete" value="Delete">
+        <a href="{{ url_for('createFood') }}" class="button">Create Food</a>
+      </form>
+    </div>
+  </body>
+
+</html>

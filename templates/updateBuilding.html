@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Update Building</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <script language="javascript" type="text/javascript">
+      function addValue() {
+         var i = document.updateBuildingForm.tagList.options.length;
+         var v = document.updateBuildingForm.tags.value;
+         AddOpt = new Option(v, v);
+         document.updateBuildingForm.tagList.options[i++] = AddOpt;
+         return true;
+       }
+      function deleteValue() {
+        var s = 1;
+        var Index;
+        if (document.updateBuildingForm.tagList.selectedIndex == -1) {
+          alert("Please select any item from the list");
+          return true;
+        }
+        while (s > 0) {
+          Index = document.updateBuildingForm.tagList.selectedIndex;
+          if (Index >= 0) {
+            document.updateBuildingForm.tagList.options[Index] = null;
+             --i;
+          }
+          else
+            s = 0;
+          }
+          return true;
+      }
+      function submitChanges() {
+        console.log(document.updateBuildingForm.tagList.options)
+        var options = document.updateBuildingForm.tagList.options
+        for (var i=0; i<options.length; i++) {
+          options[i].selected = true;
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="updateBuilding main">
+      <h1 class="h1main">Update Building</h1>
+        <div class="links">
+          <!-- needs to be home -->
+          <a href="{{ url_for('updateBuilding', buildingName=buildingName) }}" class="active">Back</a>
+        </div>
+      <form name="updateBuildingForm" action="{{ url_for('updateBuilding', buildingName=buildingName) }}" method="post">
+        <label for="buildingName">
+          Name
+        </label>
+        <input type="text" name="buildingName" value="{{ buildingName }}" id="buildingName"></input>
+        <label for="description">
+          Description
+        </label>
+        <textarea type="text" name="description" id="description" value="{{ description }}" required>{{ description }}</textarea>
+
+        <label for="tags">
+          Tags
+        </label>
+        <input name="tags" type="text"/>
+        <input type="button" name="add" value="Add" onclick="addValue();"/>
+        <select name="tagList" id="tagList" multiple>
+          {% for tag in tags %}
+            <option value="{{ tag }}">{{ tag }}</option>
+          {% endfor %}        </select>
+        <input type="button" name="delete" value="Delete" onclick="deleteValue();" />
+        <div class="msg">{{ msg }}</div>
+        <input type="button" name="huh" value="huh" onclick="submitChanges();" />
+        <input type="submit" name="update" value="Update" onclick="submitChanges();" />
+      </form>
+    </div>
+  </body>
+
+</html>
