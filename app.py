@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import hashlib
 import MySQLdb
 import re
+import sys
 
 app = Flask(__name__, static_url_path="")
-# app.secret_key = 'foodtruck'
+app.secret_key = 'foodtruck'
 
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
@@ -12,10 +13,6 @@ db_connection = MySQLdb.connect(host="127.0.0.1",
 						   passwd = "root",
 						   db = "cs4400spring2020",
 						   port = 3306)
-# If connection is not successful
-
-
-
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -26,18 +23,22 @@ def login():
 		# Create variables for easy access
 		username = request.form['username']
 		password = request.form['password']
-		password = hashlib.md5(password.encode()).hexdigest()
 		# Check if account exists using MySQL
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s', (username, password,))
+		cursor.callproc('login', (username, password))
 		# Fetch one record and return result
+		db_connection.commit()
+
+		cursor.execute('SELECT * FROM login_result')
 		account = cursor.fetchone()
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
 			session['loggedin'] = True
+			session['username'] = account['username']
+			session['userType'] = account['userType']
 			# Redirect to home page
-			return 'Logged in successfully!'
+			return redirect(url_for('home'))
 		else:
 			# Account doesnt exist or username/password incorrect
 			msg = 'Incorrect username/password!'
@@ -53,14 +54,41 @@ def logout():
 def register():
 	# Output message if something goes wrong...
 	msg = ''
-	# Check if "username", "password" and "email" POST requests exist (user submitted form)
-	if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'confirm_password' in request.form and 'firstname' in request.form and 'lastname' in request.form:
+	# Check if POST requests exist (user submitted form)
+	if request.method == 'POST':
 		# Create variables for easy access
 		username = request.form['username']
 		password = request.form['password']
 		confirm_password = request.form['confirm_password']
 		firstname = request.form['firstname']
 		lastname = request.form['lastname']
+		email = request.form['email']
+		balance = request.form['balance']
+
+		if balance:
+			try:
+				float(balance)
+			except ValueError:
+				msg = 'Balance must be a positive decimal number!'
+				return render_template('register.html', msg=msg)
+		else:
+			balance = None
+
+		if email:
+			if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+				msg = 'Invalid email address!'
+				return render_template('register.html', msg=msg)
+			if 'role' in request.form:
+				role = request.form['role']
+			else:
+				role = None
+		else:
+			email = None
+			role = None
+
+		if not balance and not (email and role):
+			msg = 'Please fill out balance (positive decimal) and/or email and select a role!'
+			return render_template('register.html', msg=msg)
 
 	# Check if account exists using MySQL
 		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
@@ -69,81 +97,103 @@ def register():
 		# If account exists show error and validation checks
 		if account:
 			msg = 'Account already exists!'
+			return render_template('register.html', msg=msg)
 		elif not re.match(r'[A-Za-z0-9]+', username):
 			msg = 'Username must contain only characters and numbers!'
+			return render_template('register.html', msg=msg)
 		elif len(password) < 8:
 			msg = 'Please choose a password length of at least 8!'
+			return render_template('register.html', msg=msg)
 		elif password != confirm_password:
 			msg = 'Passwords do not match!'
-		elif not username or not password or not confirm_password or not firstname or not lastname:
-			msg = 'Please fill out the form!'
-		elif 'balance' in request.form:
-			balance = request.form['balance']
-			# Account doesnt exists and the form data is valid, now insert new account into accounts table
-			try:
-				float(balance)
-			except ValueError:
-				msg = 'Balance must be a postiive decimal number!'
-			if msg == '':
-				if float(balance) > 0:
-					password = hashlib.md5(password.encode()).hexdigest()
-					cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-					cursor.execute('INSERT INTO customer VALUES(%s, %s, NULL)', (username, balance,))
-					db_connection.commit()
-					msg = 'You have successfully registered!'
-		elif 'email' in request.form:
-			email = request.form['email']
-			if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-				msg = 'Invalid email address!'
-			elif role:
-				role = request.form['role']
-				password = hashlib.md5(password.encode()).hexdigest()
-				cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-				cursor.execute('INSERT INTO employee VALUES(%s, %s)', (username, email))
-				if role == 'admin':
-					cursor.execute('INSERT INTO admin VALUES(%s, %s)', (username, email))
-				elif role == 'manager':
-					cursor.execute('INSERT INTO manager VALUES(%s, %s)', (username, email))
-				elif role == 'staff':
-					cursor.execute('INSERT INTO staff VALUES(%s, %s, NULL)', (username, email))
-				db_connection.commit()
-				msg = 'You have successfully registered!'
-			else:
-				msg = 'Please select a role!'
-		elif 'balance' in request.form and 'email' in request.form:
-			balance = request.form['balance']
-			email = request.form['email']
-			try:
-				float(balance)
-			except ValueError:
-				msg = 'Balance must be a postive decimal number!'
-				if msg == '':
-					if float(balance) > 0:
-						if role:
-							role = request.form['role']
-							password = hashlib.md5(password.encode()).hexdigest()
-							cursor.execute('INSERT INTO user VALUES (%s, %s, %s, %s)', (username, password, firstname, lastname))
-							cursor.execute('INSERT INTO customer VALUES(%s, %s, NULL)', (username, balance,))
-							cursor.execute('INSERT INTO employee VALUES(%s, %s)', (username, email))
-							if role == 'admin':
-								cursor.execute('INSERT INTO admin VALUES(%s, %s)', (username, email))
-							elif role == 'manager':
-								cursor.execute('INSERT INTO manager VALUES(%s, %s)', (username, email))
-							elif role == 'staff':
-								cursor.execute('INSERT INTO staff VALUES(%s, %s, NULL)', (username, email))
-							db_connection.commit()
-							msg = 'You have successfully registered!'
-						else:
-							msg = 'Please select a role!'
-		else:
-			msg = 'Please fill out balance (positve decimal) and/or email!'
+			return render_template('register.html', msg=msg)
 
+		cursor.callproc('register', (username, email, firstname, lastname, password, balance, role))
+		db_connection.commit()
+		cursor.close()
+		msg = 'You have successfully registered!'
 	return render_template('register.html', msg=msg)
+
+@app.route('/home')
+def home():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('home.html', username=session['username'], userType=session['userType'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+@app.route('/manage_building_station', methods=['GET', 'POST'])
+def manage_building_station():
+	msg = ''
+	# Drop-down menus
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT buildingName from building')
+	buildings = cursor.fetchall()
+	cursor.execute('SELECT stationName from station')
+	stations = cursor.fetchall()
+
+	if request.method == 'POST':
+		# Filters
+		if 'filter' in request.form:
+			building_tag = request.form['building_tag']
+			min_capacity = request.form['min_capacity']
+			max_capacity = request.form['max_capacity']
+			if 'building_name' in request.form:
+				building_name = request.form['building_name']
+			else:
+				building_name = ''
+			if 'station_name' in request.form:
+				station_name = request.form['station_name']
+			else:
+				station_name = ''
+			if min_capacity == '':
+				min_capacity = None
+			if max_capacity == '':
+				max_capacity = None
+			cursor.callproc('ad_filter_building_station', (building_name, building_tag, station_name, min_capacity, max_capacity))
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_building_station_result')
+			result = cursor.fetchall()
+			return render_template('manage_building_station.html', msg=msg, result=result, buildings=buildings, stations=stations)
+
+		# Delete buttons
+		if 'building_select' in request.form and 'delete_building' in request.form:
+			building_select = request.form['building_select']
+			cursor.callproc('ad_delete_building', (building_select))
+			db_connection.commit()
+			msg = 'Building deleted!'
+		elif 'building_select' in request.form and 'delete_station' in request.form:
+			building_select = request.form['building_select']
+			cursor.callproc('ad_delete_station', (building_select))
+			db_connection.commit()
+			msg = 'Station deleted!'
+		elif 'delete_building' in request.form or 'delete_station' in request.form:
+			msg = 'Select a building or station to delete.'
+
+		# Update buttons
+		if 'building_select' in request.form and 'update_building' in request.form:
+			building_select = request.form['building_select']
+			cursor.execute('SELECT description FROM building WHERE buildingName = %s', (building_select))
+			description = cursor.fetchone()
+			cursor.execute('SELECT tag FROM buildingtag WHERE buildingName = %s', (building_select))
+			tag = cursor.fetchone()
+			return redirect(url_for('update_building'))
+		if 'building_select' in request.form and 'update_station' in request.form:
+			building_select = request.form['building_select']
+			cursor.execute('SELECT stationName FROM station WHERE buildingName = %s', (building_select))
+			stationName = cursor.fetchone()
+			cursor.execute('SELECT capacity FROM station WHERE buildingName = %s', (building_select))
+			capacity = cursor.fetchone()
+			return redirect(url_for('update_station'))
+
+	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
 
 @app.route('/orderhistory', methods=['GET', 'POST'])
 def cus_order_history():
 	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.callproc('cus_order_history', ["customer1",])
+	username=session['username']
+	cursor.callproc('cus_order_history', [username,])
 	# for result in cursor.stored_results():
 	# 	print(result.fetchall())
 	cursor.execute('SELECT * FROM cus_order_history_result')
@@ -164,6 +214,5 @@ def cus_order_history():
 	# 	print(order['orderID'])
 
 	return render_template('orderhistory.html', history_list=history_list)
-
 if __name__ == '__main__':
 	app.run(debug=True)

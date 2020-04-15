@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Home</title>
+		<meta charset="utf-8">
+			<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	</head>
+	<body>
+		<div class="home">
+			<h1>Home</h1>
+            <input type="button" value="Explore" class="Customer">
+            <input type="button" value="View Order History" class="Customer">
+            <input type="button" value="Place Order" class="Customer">
+            <input type="button" value="View Current Information" class="Customer">
+            <input type="button" value="Manage Food Truck" class="Manager">
+            <input type="button" value="View Food Truck Summary" class="Manager">
+            <a href="{{ url_for('manage_building_station') }}">
+            	<input type="button" value="Manage Building & Station" class="Admin">
+            </a>
+            <input type="button" value="Manage Food" class="Admin">
+		</div>
+		<script type="text/javascript">
+			if ('{{ userType }}'.includes("Customer")) {
+				$('input.Customer').show();
+			}
+
+			if('{{ userType }}'.includes("Manager")) {
+				$('input.Manager').show();
+			}
+
+			if('{{ userType }}'.includes("Admin")) {
+				$('input.Admin').show();
+			}
+		</script>
+	</body>
+</html>
