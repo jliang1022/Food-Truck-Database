@@ -52,7 +52,8 @@ body {
     font-weight: bold;
 }
 .login .links a:hover,
-.register .links a:hover {
+.register .links a:hover,
+.updateStation .links a:hover {
     color: #9da3ac;
 }
 .login .links a.active,
@@ -124,7 +125,8 @@ body {
 .login form input[type="submit"],
 .register input[type="submit"],
 .createFood input[type="submit"],
-.manageFood input[type="submit"] {
+.manageFood input[type="submit"],
+.updateStation input[type="submit"] {
     width: 100%;
     padding: 15px;
     margin-top: 20px;
@@ -169,3 +171,4 @@ body {
 .manageFoodTable td{
     border:1px solid #000000;
 }
+

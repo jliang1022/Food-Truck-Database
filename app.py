@@ -266,10 +266,19 @@ def updateStation(stationName):
 	print(station['buildingName'])
 	cursor.execute('SELECT buildingName FROM Building')
 	buildings = [item['buildingName'] for item in cursor.fetchall()]
-	# print(buildings)
 
-
-	return render_template('updateStation.html', stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
+	if request.method == "POST":
+		if int(request.form['capacity']) > 0:
+			args = []
+			args.append(stationName)
+			args.append(request.form['capacity'])
+			args.append(request.form['sponsoredBuilding'])
+			print(request.form)
+			cursor.callproc('ad_update_station', args)
+			db_connection.commit()
+		else:
+			msg = 'Capacity must be positive.'
+	return render_template('updateStation.html', msg=msg, stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
 
 if __name__ == '__main__':
 	app.run(debug=True)
