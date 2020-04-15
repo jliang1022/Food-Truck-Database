@@ -1,18 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import hashlib
-# from flask_mysqldb import MySQL
 import MySQLdb
 import re
 
 app = Flask(__name__, static_url_path="")
-app.secret_key = 'foodtruck'
-# mysql = MySQL(app)
+# app.secret_key = 'foodtruck'
 
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
-						   passwd = "Jl102298722321487",
-						   db = "foodtruck",
+						   passwd = "root",
+						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
 
@@ -141,6 +139,31 @@ def register():
 			msg = 'Please fill out balance (positve decimal) and/or email!'
 
 	return render_template('register.html', msg=msg)
+
+@app.route('/orderhistory', methods=['GET', 'POST'])
+def cus_order_history():
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('cus_order_history', ["customer1",])
+	# for result in cursor.stored_results():
+	# 	print(result.fetchall())
+	cursor.execute('SELECT * FROM cus_order_history_result')
+	items = cursor.fetchall()
+	history_list=[]
+
+	for item in items:
+		print(item)
+		order={}
+		order['date'] = item['date']
+		order['orderID'] = item['orderID']
+		order['orderTotal'] = item['orderTotal']
+		order['foodNames'] = item['foodNames']
+		order['foodQuantity'] = item['foodQuantity']
+		history_list.append(order)
+
+	# for order in history_list:
+	# 	print(order['orderID'])
+
+	return render_template('orderhistory.html', history_list=history_list)
 
 if __name__ == '__main__':
 	app.run(debug=True)
