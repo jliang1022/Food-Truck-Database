@@ -46,7 +46,7 @@
       <h1 class="h1main">Update Building</h1>
         <div class="links">
           <!-- needs to be home -->
-          <a href="{{ url_for('updateBuilding', buildingName=buildingName) }}" class="active">Back</a>
+          <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
         </div>
       <form name="updateBuildingForm" action="{{ url_for('updateBuilding', buildingName=buildingName) }}" method="post">
         <label for="buildingName">

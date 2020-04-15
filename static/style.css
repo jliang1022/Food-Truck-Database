@@ -209,13 +209,18 @@ h1 {
     margin-right: 10px;
     text-align: right;
 }
-.manageFoodTable th {
-.manage_building_station form label select, .manage_building_station form label input {
+.manageFoodTable th,
+.manage_building_station form label select, 
+.manage_building_station form label input {
     width: 120px;
+    margin-top: 10px
 }
 .manage_building_station form label {
+    padding: 10px;
+    display: inline-grid;
 }
 a.button, 
+.manage_building_station form input[type="submit"],
 .create_building form input[type="submit"] {
     background-color: #3274d6; /* Green */
     border: none;
@@ -225,6 +230,7 @@ a.button,
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    border-radius: 8px;
     margin-right: 100px;
     margin-left: 100px;
     margin-bottom: 20px;

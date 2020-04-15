@@ -12,7 +12,7 @@
       <h1 class="h1main">Update Station</h1>
         <div class="links">
           <!-- needs to be home -->
-          <a href="{{ url_for('updateStation', stationName=stationName) }}" class="active">Back</a>
+          <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
         </div>
       <form action="{{ url_for('updateStation', stationName=stationName) }}" method="post">
         <label for="stationName">

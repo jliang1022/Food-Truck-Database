@@ -181,18 +181,16 @@ def manage_building_station():
 		# Update buttons
 		if 'building_select' in request.form and 'update_building' in request.form:
 			building_select = request.form['building_select']
-			cursor.execute('SELECT description FROM building WHERE buildingName = %s', (building_select))
-			description = cursor.fetchone()
-			cursor.execute('SELECT tag FROM buildingtag WHERE buildingName = %s', (building_select))
-			tag = cursor.fetchone()
-			return redirect(url_for('update_building'))
+			return redirect(url_for('updateBuilding', buildingName=building_select))
 		if 'building_select' in request.form and 'update_station' in request.form:
 			building_select = request.form['building_select']
-			cursor.execute('SELECT stationName FROM station WHERE buildingName = %s', (building_select))
-			stationName = cursor.fetchone()
-			cursor.execute('SELECT capacity FROM station WHERE buildingName = %s', (building_select))
-			capacity = cursor.fetchone()
-			return redirect(url_for('update_station'))
+			try:
+				cursor.execute('SELECT stationName FROM station WHERE buildingName = %s', (building_select,))
+			except:
+				msg = "Selecting building has no station(s)."
+				render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
+			station_result = cursor.fetchone()
+			return redirect(url_for('updateStation', stationName=station_result['stationName']))
 	cursor.close()
 	
 	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
@@ -212,8 +210,12 @@ def create_building():
 		cursor.callproc('ad_create_building', (building_name, building_description))
 		db_connection.commit()
 		for tag in tags:
-			cursor.callproc('ad_add_building_tag', (building_name, tag))
-			db_connection.commit()
+			try:
+				cursor.callproc('ad_add_building_tag', (building_name, tag))
+				db_connection.commit()
+			except:
+				msg = "No duplicate tags!"
+				return render_template('create_building.html', msg=msg)
 	return render_template('create_building.html', msg=msg)
 
 # might not need get ??

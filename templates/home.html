@@ -8,7 +8,7 @@
 			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	</head>
 	<body>
-		<div class="home">
+		<div class="home main">
 			<h1>Home</h1>
             <input type="button" value="Explore" class="Customer">
             <input type="button" value="View Order History" class="Customer">
@@ -19,7 +19,9 @@
             <a href="{{ url_for('manage_building_station') }}">
             	<input type="button" value="Manage Building & Station" class="Admin">
             </a>
-            <input type="button" value="Manage Food" class="Admin">
+            <a href="{{ url_for('manageFood') }}">
+            	<input type="button" value="Manage Food" class="Admin">
+        	</a>
 		</div>
 		<script type="text/javascript">
 			if ('{{ userType }}'.includes("Customer")) {
