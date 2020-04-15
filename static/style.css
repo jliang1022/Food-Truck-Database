@@ -27,7 +27,7 @@ body {
 }
 
 .login h1,
-.register h1
+.register h1,
 .h1main {
     text-align: center;
     color: #5b6574;
@@ -36,12 +36,15 @@ body {
     border-bottom: 1px solid #dee0e4;
 }
 .login .links,
-.register .links {
+.register .links,
+.links {
     display: flex;
     padding: 0 15px;
 }
+
 .login .links a,
-.register .links a {
+.register .links a,
+.links a {
     color: #adb2ba;
     text-decoration: none;
     display: inline-flex;
@@ -60,7 +63,8 @@ body {
 .login form,
 .register form,
 .createFood form,
-.manageFood form{
+.manageFood form,
+.updateStation form{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -76,7 +80,9 @@ body {
 .register form label[for='lastname'],
 .register form label[for='balance'],
 .register form label[for='role'],
-.createFood form label[for='foodName']{
+.createFood form label[for='foodName'],
+.updateStation form label[for='stationName'],
+.updateStation form label[for='capacity']{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -131,12 +137,13 @@ body {
 }
 .login form input[type="submit"]:hover,
 .register input[type="submit"]:hover,
-.createFood  input[type="submit"]:hover {
+.createFood input[type="submit"]:hover {
     background-color: #2868c7;
     transition: background-color 0.2s;
 }
 
-.createFood form input [type='text']{
+.createFood form input[type='text'],
+.updateStation form input[type='text']{
     width: 310px;
     height: 50px;
     border: 1px solid #000000;

@@ -255,5 +255,21 @@ def manageFood():
 	cursor.close()
 	return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
 
+@app.route('/updateStation/<stationName>', methods=['GET', 'POST'])
+def updateStation(stationName):
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_view_station', [stationName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_station_result')
+	station = cursor.fetchone()
+	print(station['buildingName'])
+	cursor.execute('SELECT buildingName FROM Building')
+	buildings = [item['buildingName'] for item in cursor.fetchall()]
+	# print(buildings)
+
+
+	return render_template('updateStation.html', stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
+
 if __name__ == '__main__':
 	app.run(debug=True)
