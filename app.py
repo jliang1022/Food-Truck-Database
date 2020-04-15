@@ -7,7 +7,7 @@ import sys
 import json
 
 app = Flask(__name__, static_url_path="")
-app.secret_key = 'foodtruck'
+app.secret_key = 'cs4400spring2020'
 # mysql = MySQL(app)
 
 #Trying to connect
@@ -216,6 +216,245 @@ def create_building():
 			db_connection.commit()
 	return render_template('create_building.html', msg=msg)
 
+# might not need get ??
+@app.route('/createFood', methods=['GET', 'POST'])
+def createFood():
+	msg = ''
+	if request.method == 'POST':
+		cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute("SELECT * FROM Food WHERE foodName =%s", [request.form["foodName"]])
+		food = cursor.fetchone()
+		if food is None:
+			args = []
+			args.append(request.form["foodName"])
+			cursor.callproc('ad_create_food', args)
+			db_connection.commit()
+		else:
+			msg = "Food already exists."
+		cursor.close()
+	return render_template('createFood.html', msg=msg)
+
+@app.route('/manageFood', methods=['GET', 'POST'])
+def manageFood():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute("SELECT foodName FROM MenuItem")
+	menuItems = [item['foodName'] for item in cursor.fetchall()]
+
+	cursor.execute("select foodName, sum(purchaseQuantity) from OrderDetail group by foodName")
+	purchaseQuantity = cursor.fetchall()
+	purchaseQuantityDict = {}
+	for item in purchaseQuantity:
+		purchaseQuantityDict[item['foodName']] = int(item['sum(purchaseQuantity)'])
+
+	cursor.execute("SELECT foodName FROM Food")
+	foods = cursor.fetchall()
+	for food in foods:
+		itemCount = 0
+		if food['foodName'] in purchaseQuantityDict.keys():
+			itemCount = purchaseQuantityDict[food['foodName']]
+		food['menuCount'] = menuItems.count(food['foodName'])
+		food['purchaseCount'] = itemCount
+
+	if request.method == "POST":
+		print(request.form)
+		#filter
+		if "filter" in request.form:
+			try:
+				args = [request.form["filterFood"], None, None]
+				cursor.callproc('ad_filter_food', args)
+				db_connection.commit()
+				cursor.execute('SELECT * FROM ad_filter_food_result')
+				filtered = cursor.fetchall()
+				return render_template('manageFood.html', allFoods=foods, items=filtered)
+			except:
+				msg = 'Pick a food to filter by.'
+				return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
+
+		#sorting
+		if "sortNameASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "name", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortNameDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "name", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortMenuCountASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "menuCount", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortMenuCountDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "menuCount", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortPurchCountASC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "purchaseCount", "ASC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		if "sortPurchCountDESC" in request.form:
+			cursor.callproc('ad_filter_food', [None, "purchaseCount", "DESC"])
+			db_connection.commit()
+			cursor.execute('SELECT * FROM ad_filter_food_result')
+			sortedList = cursor.fetchall()
+			return render_template('manageFood.html', allFoods=foods, items=sortedList)
+
+		# delete food
+		if "delete" in request.form:
+			try:
+				args = []
+				args.append(request.form["food"])
+				cursor.callproc('ad_delete_food', args)
+				db_connection.commit()
+			except:
+				msg = 'Cannot delete food.'
+				return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
+	cursor.close()
+	return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
+
+@app.route('/updateStation/<stationName>', methods=['GET', 'POST'])
+def updateStation(stationName):
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_view_station', [stationName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_station_result')
+	station = cursor.fetchone()
+	cursor.execute('SELECT buildingName FROM Building')
+	buildings = [item['buildingName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		if int(request.form['capacity']) > 0:
+			args = []
+			args.append(stationName)
+			args.append(request.form['capacity'])
+			args.append(request.form['sponsoredBuilding'])
+			cursor.callproc('ad_update_station', args)
+			db_connection.commit()
+		else:
+			msg = 'Capacity must be positive.'
+	cursor.close()
+	return render_template('updateStation.html', msg=msg, stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
+
+@app.route('/createStation', methods=['GET', 'POST'])
+def createStation():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_get_available_building')
+	db_connection.commit()
+	cursor.execute('SELECT buildingName FROM ad_get_available_building_result')
+	buildings = [item['buildingName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		name = request.form['stationName']
+		capacity = request.form['capacity']
+		sponsoredBuilding = request.form['sponsoredBuilding']
+
+		cursor.execute("SELECT * FROM Station WHERE stationName = %s", [name])
+		existingName = cursor.fetchone()
+
+		try:
+			if existingName is not None:
+				msg = "Station already exists. Please pick another name."
+
+			elif int(request.form['capacity']) <= 0:
+				msg = "Capacity must be positive."
+
+			else:
+				args = []
+				args.append(name)
+				args.append(sponsoredBuilding)
+				args.append(capacity)
+				cursor.callproc('ad_create_station', args)
+				db_connection.commit()
+
+		except:
+			msg = "Capacity must be an integer."
+
+	cursor.close()
+	return render_template('createStation.html', msg=msg, buildings=buildings)
+
+@app.route('/updateBuilding/<buildingName>', methods=['GET', 'POST'])
+def updateBuilding(buildingName):
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_view_building_general', [buildingName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_building_general_result')
+	building = cursor.fetchone()
+	description = building['description']
+
+	cursor.callproc('ad_view_building_tags', [buildingName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_building_tags_result')
+	tags = [item['tag'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		print(request.form)
+		print(request.form.getlist('tagList'))
+		newName = request.form['buildingName']
+		newDescription = request.form['description']
+		tagList = request.form.getlist('tagList')
+
+		# name hasn't changed
+		if newName == buildingName:
+			# do normally
+			args = []
+			args.append(buildingName)
+			args.append(newName)
+			args.append(newDescription)
+			cursor.callproc('ad_update_building', args)
+			db_connection.commit()
+
+		# name changed, need to check if new name already exists
+		elif newName != buildingName:
+			cursor.execute("SELECT * FROM Building WHERE buildingName = %s", [newName])
+			existingName = cursor.fetchone()
+			if existingName is not None:
+				print("here")
+				msg = "A building with this name already exists, pick a new name."
+				return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
+			else:
+				# do normally
+				args = []
+				args.append(buildingName)
+				args.append(newName)
+				args.append(newDescription)
+				cursor.callproc('ad_update_building', args)
+				db_connection.commit()
+
+		for tag in tagList:
+			if tag in tags:
+				# don't do anything
+				continue
+			if tag not in tags and tag != '':
+				print("adding tag")
+				# add new tag
+				cursor.callproc('ad_add_building_tag', [newName, tag])
+				db_connection.commit()
+		for tag in tags:
+			if tag not in tagList:
+				print("deleting tag")
+				# delete tag
+				cursor.callproc('ad_remove_building_tag', [newName, tag])
+
+	cursor.close()
+	return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
 
 if __name__ == '__main__':
 	app.run(debug=True)

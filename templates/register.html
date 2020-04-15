@@ -8,8 +8,8 @@
 			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
 	</head>
 	<body>
-		<div class="register">
-			<h1>Register</h1>
+		<div class="register main">
+			<h1 class="h1main">Register</h1>
 			<div class="links">
 				<a href="{{ url_for('login') }}">Login</a>
 				<a href="{{ url_for('register') }}" class="active">Register</a>
@@ -49,11 +49,11 @@
 				<label for="admin">Admin
 					<input type="radio" name ="role" id="admin" value="Admin">
 				</label>
-				
+
 				<label for="manager">Manager
 					<input type="radio" name ="role" id="manager" value="Manager">
 				</label>
-				
+
 				<label for="staff">Staff
 					<input type="radio" name ="role" id="staff" value="Staff">
 				</label>
