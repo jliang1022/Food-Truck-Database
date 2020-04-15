@@ -250,8 +250,6 @@ def manageFood():
 			except:
 				msg = 'Cannot delete food.'
 				return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
-
-	print(request.form)
 	cursor.close()
 	return render_template('manageFood.html', msg=msg, allFoods=foods, items=foods)
 
@@ -263,7 +261,6 @@ def updateStation(stationName):
 	db_connection.commit()
 	cursor.execute('SELECT * FROM ad_view_station_result')
 	station = cursor.fetchone()
-	print(station['buildingName'])
 	cursor.execute('SELECT buildingName FROM Building')
 	buildings = [item['buildingName'] for item in cursor.fetchall()]
 
@@ -273,12 +270,49 @@ def updateStation(stationName):
 			args.append(stationName)
 			args.append(request.form['capacity'])
 			args.append(request.form['sponsoredBuilding'])
-			print(request.form)
 			cursor.callproc('ad_update_station', args)
 			db_connection.commit()
 		else:
 			msg = 'Capacity must be positive.'
+	cursor.close()
 	return render_template('updateStation.html', msg=msg, stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
 
+@app.route('/createStation', methods=['GET', 'POST'])
+def createStation():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_get_available_building')
+	db_connection.commit()
+	cursor.execute('SELECT buildingName FROM ad_get_available_building_result')
+	buildings = [item['buildingName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		name = request.form['stationName']
+		capacity = request.form['capacity']
+		sponsoredBuilding = request.form['sponsoredBuilding']
+
+		cursor.execute("SELECT * FROM Station WHERE stationName = %s", [name])
+		existingName = cursor.fetchone()
+
+		try:
+			if existingName is not None:
+				msg = "Station already exists. Please pick another name."
+
+			elif int(request.form['capacity']) <= 0:
+				msg = "Capacity must be positive."
+
+			else:
+				args = []
+				args.append(name)
+				args.append(sponsoredBuilding)
+				args.append(capacity)
+				cursor.callproc('ad_create_station', args)
+				db_connection.commit()
+
+		except:
+			msg = "Capacity must be an integer."
+
+	cursor.close()
+	return render_template('createStation.html', msg=msg, buildings=buildings)
 if __name__ == '__main__':
 	app.run(debug=True)

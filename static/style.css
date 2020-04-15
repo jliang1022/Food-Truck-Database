@@ -53,7 +53,8 @@ body {
 }
 .login .links a:hover,
 .register .links a:hover,
-.updateStation .links a:hover {
+.updateStation .links a:hover,
+.links a:hover {
     color: #9da3ac;
 }
 .login .links a.active,
@@ -65,7 +66,8 @@ body {
 .register form,
 .createFood form,
 .manageFood form,
-.updateStation form{
+.updateStation form,
+.createStation form {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -83,7 +85,10 @@ body {
 .register form label[for='role'],
 .createFood form label[for='foodName'],
 .updateStation form label[for='stationName'],
-.updateStation form label[for='capacity']{
+.updateStation form label[for='capacity'],
+.createStation form label[for='stationName'],
+.createStation form label[for='capacity'],
+.createStation form label[for='sponsoredBuilding'] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -126,7 +131,8 @@ body {
 .register input[type="submit"],
 .createFood input[type="submit"],
 .manageFood input[type="submit"],
-.updateStation input[type="submit"] {
+.updateStation input[type="submit"],
+.createStation input[type="submit"]{
     width: 100%;
     padding: 15px;
     margin-top: 20px;
@@ -139,13 +145,17 @@ body {
 }
 .login form input[type="submit"]:hover,
 .register input[type="submit"]:hover,
-.createFood input[type="submit"]:hover {
+.createFood input[type="submit"]:hover,
+.manageFood input[type="submit"]:hover,
+.updateStation input[type="submit"]:hover,
+.createStation input[type="submit"]:hover {
     background-color: #2868c7;
     transition: background-color 0.2s;
 }
 
 .createFood form input[type='text'],
-.updateStation form input[type='text']{
+.updateStation form input[type='text'],
+.createStation form input[type='text']{
     width: 310px;
     height: 50px;
     border: 1px solid #000000;
