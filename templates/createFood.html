@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Create Food</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+  </head>
+
+  <body>
+    <div class="createFood main">
+      <h1 class="h1main">Create Food</h1>
+        <!-- needs to be manage food -->
+        <a href="{{ url_for('manageFood') }}" class="active">Back</a>
+        <!-- <div class="links">
+          <a href="{{ url_for('login') }}" class="active">Login</a>
+          <a href="{{ url_for('register') }}">Register</a>
+        </div> -->
+      <form action="{{ url_for('createFood') }}" method="post">
+        <label for="foodName">
+          <i class="fas fa-utensils"></i>
+        </label>
+        <input type="text" name="foodName" placeholder="Food" id="foodName" required>
+        <div class="msg">{{ msg }}</div>
+        <input type="submit" value="Create">
+      </form>
+    </div>
+  </body>
+
+</html>
