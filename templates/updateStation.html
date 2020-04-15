@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Update Station</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+  </head>
+
+  <body>
+    <div class="updateStation main">
+      <h1 class="h1main">Update Station</h1>
+        <div class="links">
+          <!-- needs to be home -->
+          <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
+        </div>
+      <form action="{{ url_for('updateStation', stationName=stationName) }}" method="post">
+        <label for="stationName">
+          Name
+        </label>
+        <input type="text" name="stationName" placeholder="{{ stationName }}" id="stationName" readonly>
+        <label for="capacity">
+          Capacity
+        </label>
+        <input type="text" name="capacity" id="capacity" value="{{ capacity }}" required>
+        <label for="sponsoredBuilding">
+          Sponsored Building:
+        </label>
+          <select name="sponsoredBuilding">
+            <option selected value="{{ sponsoredBuilding }}">{{ sponsoredBuilding }}</option>
+            {% for building in buildings %}
+              <option value="{{ building }}">{{ building }}</option>
+            {% endfor %}
+          </select>
+        <div class="msg">{{ msg }}</div>
+        <input type="submit" name="update" value="Update">
+      </form>
+    </div>
+  </body>
+
+</html>

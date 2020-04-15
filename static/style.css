@@ -9,44 +9,79 @@ body {
     background-color: #435165;
     margin: 0;
 }
-.login, .register {
+
+.login,
+.register,
+.main {
     width: 400px;
     background-color: #ffffff;
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
     margin: 100px auto;
 }
-.login h1, .register h1 {
+
+.manageFoodMain {
+    width: 550px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+}
+
+.manage_building_station, .create_building {
+    width: 1000px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 100px auto;
+    padding: 20px;
+}
+
+h1 {
     text-align: center;
     color: #5b6574;
     font-size: 24px;
     padding: 20px 0 20px 0;
     border-bottom: 1px solid #dee0e4;
 }
-.login .links, .register .links {
+.login .links,
+.register .links,
+.links {
     display: flex;
     padding: 0 15px;
 }
-.login .links a, .register .links a {
+
+.login .links a,
+.register .links a,
+.links a {
     color: #adb2ba;
     text-decoration: none;
     display: inline-flex;
     padding: 0 10px 10px 10px;
     font-weight: bold;
 }
-.login .links a:hover, .register .links a:hover {
+.login .links a:hover,
+.register .links a:hover,
+.updateStation .links a:hover,
+.links a:hover {
     color: #9da3ac;
 }
-.login .links a.active, .register .links a.active {
+.login .links a.active,
+.register .links a.active {
     border-bottom: 3px solid #3274d6;
     color: #3274d6;
 }
-.login form, .register form {
+.login form,
+.register form,
+.createFood form,
+.manageFood form,
+.updateStation form,
+.createStation form,
+.updateBuilding form {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     padding-top: 20px;
 }
-.login form label, 
+
+.login form label,
 .register form label[for='username'],
 .register form label[for='password'],
 .register form label[for='confirm_password'],
@@ -54,7 +89,16 @@ body {
 .register form label[for='firstname'],
 .register form label[for='lastname'],
 .register form label[for='balance'],
-.register form label[for='role'] {
+.register form label[for='role'],
+.createFood form label[for='foodName'],
+.updateStation form label[for='stationName'],
+.updateStation form label[for='capacity'],
+.createStation form label[for='stationName'],
+.createStation form label[for='capacity'],
+.createStation form label[for='sponsoredBuilding'],
+.updateBuilding form label[for='buildingName'],
+.updateBuilding form label[for='description'],
+.updateBuilding form label[for='tags'] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -75,12 +119,23 @@ body {
     padding-top: 10px;
 }
 
-.login form input[type="password"], 
-.login form input[type="text"], 
-.login form input[type="email"], 
-.register form input[type="password"], 
-.register form input[type="text"], 
-.register form input[type="email"] {
+.login form input[type="password"],
+.login form input[type="text"],
+.login form input[type="email"],
+.register form input[type="password"],
+.register form input[type="text"],
+.register form input[type="email"],
+.createFood form input[type="text"],
+.updateBuilding form input[type="text"] {
+    width: 310px;
+    height: 50px;
+    border: 1px solid #000000;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+
+.updateBuilding form textarea {
+    resize:vertical;
     width: 310px;
     height: 50px;
     border: 1px solid #000000;
@@ -92,7 +147,13 @@ body {
     vertical-align: middle;
 }
 
-.login form input[type="submit"], .register input[type="submit"] {
+.login form input[type="submit"],
+.register input[type="submit"],
+.createFood input[type="submit"],
+.manageFood input[type="submit"],
+.updateStation input[type="submit"],
+.createStation input[type="submit"],
+.updateBuilding input[type="submit"]{
     width: 100%;
     padding: 15px;
     margin-top: 20px;
@@ -103,7 +164,105 @@ body {
     color: #ffffff;
     transition: background-color 0.2s;
 }
-.login form input[type="submit"]:hover, .register input[type="submit"]:hover {
+
+.login form input[type="submit"]:hover, 
+.register input[type="submit"]:hover,
+.home input:hover,
+.manageFood input[type="submit"]:hover,
+.manageFood input[type="submit"]:hover,
+.updateStation input[type="submit"]:hover,
+.createStation input[type="submit"]:hover,
+.updateBuilding input[type="submit"]:hover {
     background-color: #2868c7;
     transition: background-color 0.2s;
 }
+.home input {
+    display: none;
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #3274d6;
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+.manage_building_station form {
+    text-align: center;
+}
+.manage_building_station form input[type="submit"] {
+    display: block;
+    margin: auto;
+}
+
+.manage_building_station form div {
+    display: inline;
+}
+.create_building form div[class="label"], .create_building form div[class="input"] {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.create_building form div[class="label"] {
+    width: 100px;
+    margin-right: 10px;
+    text-align: right;
+}
+.manageFoodTable th,
+.manage_building_station form label select, 
+.manage_building_station form label input {
+    width: 120px;
+    margin-top: 10px
+}
+.manage_building_station form label {
+    padding: 10px;
+    display: inline-grid;
+}
+a.button, 
+.manage_building_station form input[type="submit"],
+.create_building form input[type="submit"] {
+    background-color: #3274d6; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-right: 100px;
+    margin-left: 100px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.createFood form input[type='text'],
+.updateStation form input[type='text'],
+.createStation form input[type='text']{
+    width: 310px;
+    height: 50px;
+    border: 1px solid #000000;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+
+.msg {
+    color: #FF0000;
+}
+
+.manageFoodTable {
+    border-collapse: collapse;
+    border: 1px solid #000;
+}
+
+.manageFoodTable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+}
+
+.manageFoodTable td{
+    border:1px solid #000000;
+}
+
+
