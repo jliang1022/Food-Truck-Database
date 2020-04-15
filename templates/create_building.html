@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Create Building</title>
+		<meta charset="utf-8">
+			<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	</head>
+	<body>
+		<div class="create_building">
+			<h1>Create Building</h1>
+				<form id="building_form" action="{{ url_for('create_building') }}" method="post" autocomplete="off" style="text-align: center">
+					<div class="building_name">
+						<div class="label">
+							<label for="building_name">Name</label>
+						</div>
+						<div class="input">
+							<input type="text" name="building_name" required>
+						</div>
+					</div>
+					<br>
+					<div>
+						<div class="label">
+							<label for='building_description'>Description</label>
+						</div>
+						<div class="input">
+							<textarea rows="5" cols="30" name="building_description" wrap="hard" required="true"></textarea>
+						</div>
+					</div>
+					<br>
+					<div>
+						<div class="label">
+							<label for="building_tag">Tags</label>
+						</div>
+						<div class="input">
+							<table id="tags" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+								<tr>
+									<td>
+										<input type="text" name="tag" class="Tag">
+									</td>
+									<td>
+										<input type="button" name="add_tag" value="Add" onclick="addRow()">
+									</td>
+									<td>
+										<input type="button" name="del_tag" value="Delete" onclick="deleteRow(this)">
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<a href="{{ url_for('manage_building_station') }}" class="button">Back</a>
+					<input type="submit" name="create_building" value="Create" onclick="sendTags()">
+					<div class="msg" style="padding: 10px">{{ msg }}</div>
+				</form>
+		</div>
+		<script type="text/javascript">
+			var tags = [];
+			function sendTags() {
+				const hiddenField = document.createElement('input');
+				hiddenField.type = 'hidden';
+				hiddenField.name = 'tags';
+				hiddenField.value = JSON.stringify(tags);
+				document.getElementById("building_form").appendChild(hiddenField);
+			}
+			function deleteRow(element) {
+				var rowInd = element.parentNode.parentNode.rowIndex
+				if ($('#tags tr').length > 1 && rowInd != 0) {
+					document.getElementById("tags").deleteRow(rowInd);
+					tags.splice(rowInd - 1, 1);
+					console.log(tags)
+				}
+			}
+			function addRow() {
+				var tag = $('input.Tag').val();
+				if (tag != '') {
+					$('#tags').append('<tr><td>' + tag + '</td><td><input type="button"  name="del_tag" value="Delete" onclick="deleteRow(this)"></td></tr>');
+					tags.push(tag);
+					console.log(tags)
+				}
+			}
+		</script>
+	</body>
+</html>

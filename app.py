@@ -4,6 +4,7 @@ import hashlib
 import MySQLdb
 import re
 import sys
+import json
 
 app = Flask(__name__, static_url_path="")
 app.secret_key = 'foodtruck'
@@ -192,8 +193,29 @@ def manage_building_station():
 			cursor.execute('SELECT capacity FROM station WHERE buildingName = %s', (building_select))
 			capacity = cursor.fetchone()
 			return redirect(url_for('update_station'))
+	cursor.close()
 	
 	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
+
+@app.route('/create_building', methods=['GET', 'POST'])
+def create_building():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	if request.method == "POST":
+		tags = request.form["tags"]
+		tags = json.loads(tags)
+		if tags == []:
+			msg = 'Please input at least one tag.'
+			return render_template('create_building.html', msg=msg)
+		building_name = request.form["building_name"]
+		building_description = request.form["building_description"]
+		cursor.callproc('ad_create_building', (building_name, building_description))
+		db_connection.commit()
+		for tag in tags:
+			cursor.callproc('ad_add_building_tag', (building_name, tag))
+			db_connection.commit()
+	return render_template('create_building.html', msg=msg)
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
