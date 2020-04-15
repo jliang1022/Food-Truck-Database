@@ -314,5 +314,73 @@ def createStation():
 
 	cursor.close()
 	return render_template('createStation.html', msg=msg, buildings=buildings)
+
+@app.route('/updateBuilding/<buildingName>', methods=['GET', 'POST'])
+def updateBuilding(buildingName):
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.callproc('ad_view_building_general', [buildingName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_building_general_result')
+	building = cursor.fetchone()
+	description = building['description']
+
+	cursor.callproc('ad_view_building_tags', [buildingName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM ad_view_building_tags_result')
+	tags = [item['tag'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		print(request.form)
+		print(request.form.getlist('tagList'))
+		newName = request.form['buildingName']
+		newDescription = request.form['description']
+		tagList = request.form.getlist('tagList')
+
+		# name hasn't changed
+		if newName == buildingName:
+			# do normally
+			args = []
+			args.append(buildingName)
+			args.append(newName)
+			args.append(newDescription)
+			cursor.callproc('ad_update_building', args)
+			db_connection.commit()
+
+		# name changed, need to check if new name already exists
+		elif newName != buildingName:
+			cursor.execute("SELECT * FROM Building WHERE buildingName = %s", [newName])
+			existingName = cursor.fetchone()
+			if existingName is not None:
+				print("here")
+				msg = "A building with this name already exists, pick a new name."
+				return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
+			else:
+				# do normally
+				args = []
+				args.append(buildingName)
+				args.append(newName)
+				args.append(newDescription)
+				cursor.callproc('ad_update_building', args)
+				db_connection.commit()
+
+		for tag in tagList:
+			if tag in tags:
+				# don't do anything
+				continue
+			if tag not in tags and tag != '':
+				print("adding tag")
+				# add new tag
+				cursor.callproc('ad_add_building_tag', [newName, tag])
+				db_connection.commit()
+		for tag in tags:
+			if tag not in tagList:
+				print("deleting tag")
+				# delete tag
+				cursor.callproc('ad_remove_building_tag', [newName, tag])
+
+	cursor.close()
+	return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
+
 if __name__ == '__main__':
 	app.run(debug=True)
