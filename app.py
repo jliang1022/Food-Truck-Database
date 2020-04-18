@@ -52,7 +52,7 @@ def login():
 			msg = 'Incorrect username/password!'
 	return render_template('index.html', msg=msg)
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout():
 	session.pop('loggedin', None)
 	session.pop('username', None)

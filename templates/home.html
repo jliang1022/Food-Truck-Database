@@ -19,7 +19,9 @@
             <a href="{{ url_for('current_information') }}">
                 <input type="button" value="View Current Information" class="Customer">
             </a>
-            <input type="button" value="Manage Food Truck" class="Manager">
+            <a href="{{ url_for('manage_food_truck')}}">
+            	<input type="button" value="Manage Food Truck" class="Manager">
+            </a>
             <a href="{{ url_for('foodtruck_summary') }}">
                 <input type="button" value="View Food Truck Summary" class="Manager">
             </a>
@@ -28,6 +30,9 @@
             </a>
             <a href="{{ url_for('manageFood') }}">
             	<input type="button" value="Manage Food" class="Admin">
+        	</a>
+        	<a href="{{ url_for('logout') }}">
+            	<input type="button" value="Logout" class="All">
         	</a>
 		</div>
 		<script type="text/javascript">
@@ -42,6 +47,7 @@
 			if('{{ userType }}'.includes("Admin")) {
 				$('input.Admin').show();
 			}
+			$('input.All').show();
 		</script>
 	</body>
 </html>
