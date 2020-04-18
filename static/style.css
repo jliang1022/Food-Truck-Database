@@ -26,7 +26,7 @@ body {
     margin: 100px auto;
 }
 
-.manage_building_station, .create_building {
+.manage_building_station, .create_building, .manage_food_truck {
     width: 1000px;
     background-color: #ffffff;
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
@@ -221,7 +221,8 @@ h1 {
 }
 a.button, 
 .manage_building_station form input[type="submit"],
-.create_building form input[type="submit"] {
+.create_building form input[type="submit"], 
+input[type="submit"] {
     background-color: #3274d6; /* Green */
     border: none;
     color: white;
@@ -236,6 +237,17 @@ a.button,
     margin-bottom: 20px;
     margin-top: 20px;
 }
+
+input[type="submit"]:hover,
+input[type="button"]:hover,
+a.button:hover {
+    opacity: 0.5;
+}
+
+.manage_food_truck form div {
+    margin: 10px;
+}
+
 .createFood form input[type='text'],
 .updateStation form input[type='text'],
 .createStation form input[type='text']{
