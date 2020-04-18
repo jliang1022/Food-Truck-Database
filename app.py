@@ -193,13 +193,63 @@ def manage_building_station():
 			try:
 				cursor.execute('SELECT stationName FROM station WHERE buildingName = %s', (building_select,))
 			except:
-				msg = "Selecting building has no station(s)."
+				msg = "Selected building has no station(s)."
 				render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
 			station_result = cursor.fetchone()
 			return redirect(url_for('updateStation', stationName=station_result['stationName']))
 	cursor.close()
 	
 	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
+
+@app.route('/manage_food_truck', methods=['GET', 'POST'])
+def manage_food_truck():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT stationName FROM station')
+	stations = cursor.fetchall()
+	manager_name = session['username']
+	cursor.callproc('mn_filter_foodTruck', (manager_name, None, None, None, None, False))
+	db_connection.commit()
+	cursor.execute('SELECT * FROM mn_filter_foodtruck_result')
+	result = cursor.fetchall()
+	print(result, file=sys.stderr)
+	if 'filter' in request.form:
+		food_truck_name = request.form['food_truck_name']
+		station_name = request.form['station_name']
+		if food_truck_name == '':
+			food_truck_name = None
+		if station_name == '':
+			station_name = None
+		min_staff = request.form['min_staff']
+		max_staff = request.form['max_staff']
+		if min_staff == '':
+			min_staff = None
+		if max_staff == '':
+			max_staff = None
+		if 'remaining' in request.form:
+			remaining = True
+		else:
+			remaining = False
+		cursor.callproc('mn_filter_foodTruck', (manager_name, food_truck_name, station_name, min_staff, max_staff, remaining))
+		db_connection.commit()
+		cursor.execute('SELECT * FROM mn_filter_foodtruck_result')
+		result = cursor.fetchall()
+		print((manager_name, food_truck_name, station_name, min_staff, max_staff, remaining), file=sys.stderr)
+		cursor.close()
+		return render_template('manage_food_truck.html', msg=msg, stations=stations, result=result)
+	if 'foodTruck_select' in request.form and 'delete_foodTruck' in request.form:
+		foodTruck_select = request.form['foodTruck_select']
+		try:
+			cursor.execute('DELETE FROM foodtruck WHERE foodtruck = %s', (foodTruck_select,))
+			db_connection.commit()
+			msg = 'Food truck deleted!'
+		except:
+			msg = 'Cannot delete selected food truck.'
+	if 'foodTruck_select' in request.form and 'update_foodTruck' in request.form:
+		foodTruck_select = request.form['foodTruck_select']
+		return redirect(url_for('updateFoodTruck', buildingName=building_select))		
+	cursor.close()
+	return render_template('manage_food_truck.html', msg=msg, stations=stations, result=result)
 
 @app.route('/create_building', methods=['GET', 'POST'])
 def create_building():
