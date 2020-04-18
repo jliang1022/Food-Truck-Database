@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Update Food Truck </title>
+      <title>Create Food Truck </title>
       <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
@@ -41,18 +41,18 @@
 
   <body>
     <div class="updateFoodTruck main">
-      <h1 class="h1main">Update Food Truck</h1>
+      <h1 class="h1main">Create Food Truck</h1>
         <div class="links">
           <!-- needs to be manage food truck -->
           <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
         </div>
       <!-- change to manage food truck -->
-      <form action="{{ url_for('updateFoodTruck', foodTruckName=foodTruckName) }}" method="post">
+      <form action="{{ url_for('createFoodTruck') }}" method="post">
         <div>
           <label for="foodTruckName">
             Name
           </label>
-          <input type="text" name="foodTruckName" value="{{ foodTruckName }}" id="foodTruckName" readonly>
+          <input type="text" name="foodTruckName" id="foodTruckName" required>
         </div>
         <br>
 
@@ -60,12 +60,12 @@
           <label for="station">
             Station
           </label>
-          <select name="station">
-            <option selected value="{{ station }}">{{ station }}</option>
-              {% for station in stations %}
-                <option value="{{ station }}">{{ station }}</option>
-              {% endfor %}
-          </select>
+          <select name="station" required>
+            <option selected disabled hidden style='display: none' value=''></option>
+            {% for station in stations %}
+              <option value="{{ station }}">{{ station }}</option>
+            {% endfor %}
+        </select>
         </div>
         <br>
 
@@ -73,10 +73,7 @@
           <label for="assignedStaff">
             Assigned Staff:
           </label>
-          <select name="assignedStaff" class="staff" multiple>
-            {% for staff in assignedStaff %}
-              <option class="staff" selected value="{{ staff }}">{{ staff }}</option>
-            {% endfor %}
+          <select name="assignedStaff" class="staff" multiple required>
             {% for staff in availableStaff %}
               <option class="staff" value="{{ staff }}">{{ staff }}</option>
             {% endfor %}
@@ -96,12 +93,6 @@
                 Price
               </th>
             </tr>
-            {% for item in menu %}
-              <tr>
-                <td name="menuItemTable" >{{ item.foodName }}</td>
-                <td name="menuItemTable" >{{ item.price }}</td>
-              </tr>
-            {% endfor %}
           </table>
         </div>
         <br>
