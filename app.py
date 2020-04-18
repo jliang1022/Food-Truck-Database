@@ -13,7 +13,7 @@ app.secret_key = 'cs4400spring2020'
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
-						   passwd = "Jl102298722321487",
+						   passwd = "cloud1515",
 						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
@@ -35,7 +35,7 @@ def login():
 		cursor.callproc('login', (username, password))
 		# Fetch one record and return result
 		db_connection.commit()
-		
+
 		cursor.execute('SELECT * FROM login_result')
 		account = cursor.fetchone()
 		# If account exists in accounts table in out database
@@ -192,7 +192,7 @@ def manage_building_station():
 			station_result = cursor.fetchone()
 			return redirect(url_for('updateStation', stationName=station_result['stationName']))
 	cursor.close()
-	
+
 	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
 
 @app.route('/create_building', methods=['GET', 'POST'])
@@ -351,7 +351,8 @@ def updateStation(stationName):
 		else:
 			msg = 'Capacity must be positive.'
 	cursor.close()
-	return render_template('updateStation.html', msg=msg, stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
+	return render_template('updateStation.html', msg=msg, stationName=stationName,
+		capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
 
 @app.route('/createStation', methods=['GET', 'POST'])
 def createStation():
@@ -428,7 +429,6 @@ def updateBuilding(buildingName):
 			cursor.execute("SELECT * FROM Building WHERE buildingName = %s", [newName])
 			existingName = cursor.fetchone()
 			if existingName is not None:
-				print("here")
 				msg = "A building with this name already exists, pick a new name."
 				return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
 			else:
@@ -445,18 +445,85 @@ def updateBuilding(buildingName):
 				# don't do anything
 				continue
 			if tag not in tags and tag != '':
-				print("adding tag")
 				# add new tag
 				cursor.callproc('ad_add_building_tag', [newName, tag])
 				db_connection.commit()
 		for tag in tags:
 			if tag not in tagList:
-				print("deleting tag")
 				# delete tag
 				cursor.callproc('ad_remove_building_tag', [newName, tag])
+				db_connection.commit()
 
 	cursor.close()
 	return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
+
+@app.route('/updateFoodTruck/<foodTruckName>', methods=['GET', 'POST'])
+def updateFoodTruck(foodTruckName):
+	print(session['username'])
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT stationName FROM Station WHERE capacity > 0')
+	stations = [item['stationName'] for item in cursor.fetchall()]
+
+	#	get current station
+	cursor.execute('SELECT stationName FROM FoodTruck WHERE foodTruckName = %s', [foodTruckName])
+	station = cursor.fetchone()['stationName']
+
+	# get unassigned staff
+	cursor.callproc('mn_view_foodTruck_available_staff', [session['username'], foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM mn_view_foodTruck_available_staff_result')
+	availableStaff = [item['availableStaff'] for item in cursor.fetchall()]
+
+	# get assigned staff
+	cursor.callproc('mn_view_foodTruck_staff', [foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * from mn_view_foodTruck_staff_result')
+	assignedStaff = [item['assignedStaff'] for item in cursor.fetchall()]
+
+	# get current menu
+	cursor.callproc('mn_view_foodTruck_menu', [foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * from mn_view_foodTruck_menu_result')
+	menu = cursor.fetchall()
+
+	# get food items not in current menu
+	cursor.execute("SELECT foodName from Food where foodName not in %s", [[item['foodName'] for item in menu]])
+	foods = [item['foodName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		newStation = request.form['station']
+		newStaffList = request.form['assignedStaff']
+		newMenuItems = request.form['addedFoods'].split('#')[:-1]
+		newCosts = request.form['addedPrices'].split('#')[:-1]
+
+		if station != newStation:
+			# change station 22a
+			cursor.callproc('mn_update_foodTruck_station', [foodTruckName, station])
+			db_connection.commit()
+
+		# assign new staff 22b
+		for staff in newStaffList:
+			# newly assigned staff
+			if staff in availableStaff:
+				cursor.callproc('mn_update_foodTruck_staff', [foodTruckName, staff])
+				db_connection.commit()
+
+		for staff in assignedStaff:
+			# removed staff
+			if staff not in newStaffList:
+				cursor.callproc('mn_update_foodTruck_staff', [None, staff])
+				db_connection.commit()
+
+		# add new menu items 22c
+		if len(newMenuItems) > 0:
+			for i in range(len(newMenuItems)):
+				cursor.callproc('mn_update_foodTruck_menu_item', [foodTruckName, float(newCosts[i]), newMenuItems[i]])
+				db_connection.commit()
+
+	return render_template('updateFoodTruck.html', foodTruckName=foodTruckName,
+		station=station, stations=stations, assignedStaff=assignedStaff,
+		availableStaff=availableStaff, menu=menu, foods=foods)
 
 if __name__ == '__main__':
 	app.run(debug=True)
