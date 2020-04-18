@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Current Information</title>
+        <meta charset="utf-8">
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    </head>
+    <body>
+        <div class="manage_building_station">
+        <h1>Current Information</h1>
+        <form method="post" autocomplete="off">
+            <h2>Station: {{current_list[0].stationName}} </h2>
+            <h2>Building: {{current_list[0].buildingName}} </h2>
+            <h2>
+            Building Tag(s):
+            {% for row in current_list %}
+                    {{row.tags}},
+            {% endfor %}
+            </h2>
+            <h2>Building Description: {{current_list[0].description}} </h2>
+            <h2>Balance: {{current_list[0].balance}} </h2>
+                <br>
+                <div style="text-align: -webkit-center; padding: 20px">
+                    <table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+                        <tr>
+                            <th>Food Truck</th>
+                            <th>Manager</th>
+                            <th>Food(s)</th>
+                        </tr>
+
+                            {% for result in foodtruck_list %}
+                            <tr >
+                            <td style="word-break: break-word">
+                            <input type="radio" name ="foodtruck_select" id="foodtruck_select" value="{{result.foodTruckName}}">
+                            {{result.foodTruckName}}
+                            </td>
+                            <td style="word-break: break-word">{{result.managerName}}</td>
+                            <td style="word-break: break-word">{{result.foodNames}}</td>
+                            </tr>
+                            {% endfor %}
+                    </table>
+                </div>
+                <a href="{{ url_for('home') }}" class="button">Back</a>
+                <input type="submit"  name="select_order" value="Order">
+                <br>
+                <div class="msg" style="padding: 10px">{{ msg }}</div>
+            </form>
+        </div>
+    </body>
+</html>

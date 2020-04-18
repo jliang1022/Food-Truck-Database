@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Summary Detail</title>
+        <meta charset="utf-8">
+            <title>Summary Detail</title>
+            <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    </head>
+    <body>
+        <div class="register">
+        <center>
+            <h1>Order History</h1>
+            <h2>Station: {{foodtruckName}} </h2>
+        </center>
+        <table class="table table-striped"><tr><th>Date</th><th>Customer</th><th>Total Purchase</th><th># Orders</th><th>Food(s)</th></tr>
+
+        {% for foodtruck in foodtruck_list %}
+        <tr>
+        <td>{{foodtruck.date}}</td>
+        <td>{{foodtruck.customerName}}</td>
+        <td>{{foodtruck.totalPurchase}}</td>
+        <td>{{foodtruck.orderCount}}</td>
+        <td>{{foodtruck.foodNames}}</td>
+        </tr>
+        {% endfor %}
+
+
+        </table>
+        <a href="{{ url_for('foodtruck_summary') }}" class="button">Back</a>
+        </div>
+    </body>
+</html>

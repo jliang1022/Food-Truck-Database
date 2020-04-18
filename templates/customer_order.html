@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Order</title>
+        <meta charset="utf-8">
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    </head>
+    <body>
+        <div class="manage_building_station">
+        <h1>Order</h1>
+        <!-- <form action="{{ url_for('current_information') }}" method="post" autocomplete="off"> -->
+            <form action = "" method="post" autocomplete="off">
+            <h2>Food Truck: {{foodTruckName}} </h2>
+            <label for="capacity">Date
+                <input type="text" name="date" id="date">
+            </label>
+                <br>
+                <div style="text-align: -webkit-center; padding: 20px">
+                    <table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+                        <tr>
+                            <th>Food</th>
+                            <th>Price</th>
+                            <th>Purchase Quantity</th>
+                        </tr>
+
+                        {% for result in menu_list %}
+                            <tr >
+                            <td style="word-break: break-word">
+                                <input type="checkbox" name ="food_select" id="food_select" value="{{result.foodName}}">
+                                {{result.foodName}}
+                            </td>
+                            <td> {{result.price}} </td>
+                            <td>
+                                <input type="text" name="purchase_quantity" id="purchase_quantity">
+                            </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <a href="{{ url_for('current_information') }}" class="button">Back</a>
+                <input type="submit"  name="submit_order" value="Submit">
+                <br>
+                <div class="msg" style="padding: 10px">{{ msg }}</div>
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Food Truck Summary</title>
+        <meta charset="utf-8">
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    </head>
+    <body>
+        <div class="manage_building_station">
+            <h1>Food Truck Summary</h1>
+            <form action="{{ url_for('foodtruck_summary') }}" method="post" autocomplete="off">
+                <div class="capacity_filter">
+                    <label for="capacity">Food Truck Name (contain)
+                        <input type="text" name="foodtruck_name" id="foodtruck_name">
+                    </label>
+                </div>
+                <div class="station_filter">
+                    <label for="station_name">Station Name
+                        <select name="station_name" method="GET" action="/manage_building_station">
+                            <option value = '' selected="selected"></option>
+                            {% for station in stations %}
+                                <option value="{{ station['stationName'] }}">{{ station['stationName'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="capacity_filter">
+                    <label for="capacity">Date
+                        <input type="text" name="start_date" id="start_date">
+                        <input type="text" name="end_date" id="end_date">
+                    </label>
+                </div>
+                <label for="station_name">Sort By
+                    <select name="sort_by" method="GET" action="/manage_building_station">
+                        <option value = '' selected="selected"></option>
+                            <option value="Food Truck Name">Food Truck Name</option>
+                            <option value="Total Order">Total Order</option>
+                            <option value="Total Revenue">Total Revenue</option>
+                            <option value="Total Customer">Total Customer</option>
+                    </select>
+                    <select name="asc_desc" method="GET" action="/manage_building_station">
+                        <option value = '' selected="selected"></option>
+                            <option value="Ascending">Ascending</option>
+                            <option value="Descending">Descending</option>
+                    </select>
+                </label>
+                <br>
+                <input type="submit" name="filter" value="Filter">
+                <div style="text-align: -webkit-center; padding: 20px">
+                    <table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+                        <tr>
+                            <th>Food Truck Name</th>
+                            <th># Total Order</th>
+                            <th>Total Revenue</th>
+                            <th># Customer</th>
+                        </tr>
+
+                            {% for foodtruck in result %}
+                            <tr >
+                            <td style="word-break: break-word">
+                            <input type="radio" name ="foodtruck_select" id="station_select" value="{{foodtruck.foodTruckName}}">
+                            {{foodtruck.foodTruckName}}
+                            </td>
+                            <td style="word-break: break-word">{{foodtruck.totalOrder}}</td>
+                            <td style="word-break: break-word">{{foodtruck.totalRevenue}}</td>
+                            <td style="word-break: break-word">{{foodtruck.totalCustomer}}</td>
+                            </tr>
+                            {% endfor %}
+                    </table>
+                </div>
+                <a href="{{ url_for('home') }}" class="button">Back</a>
+                <input type="submit"  name="view_detail" value="View Detail">
+                <br>
+                <div class="msg" style="padding: 10px">{{ msg }}</div>
+            </form>
+        </div>
+    </body>
+</html>

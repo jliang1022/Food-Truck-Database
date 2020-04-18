@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Explore</title>
+        <meta charset="utf-8">
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+            <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    </head>
+    <body>
+        <div class="manage_building_station">
+            <h1>Explore</h1>
+            <form action="{{ url_for('customer_explore') }}" method="post" autocomplete="off">
+                <div class="building_filter">
+                    <label for="building_name">Building Name
+                        <select name="building_name" method="GET" action="/manage_building_station">
+                            <option value = '' selected="selected"></option>
+                            {% for building in buildings %}
+                                <option value="{{ building['buildingName'] }}">{{ building['buildingName'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="station_filter">
+                    <label for="station_name">Station Name
+                        <select name="station_name" method="GET" action="/manage_building_station">
+                            <option value = '' selected="selected"></option>
+                            {% for station in stations %}
+                                <option value="{{ station['stationName'] }}">{{ station['stationName'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="capacity_filter">
+                    <label for="capacity">Building Tag (contain)
+                        <input type="text" name="building_tag" id="building_tag">
+                    </label>
+                    <label for="capacity">Food Truck Name (contain)
+                        <input type="text" name="foodtruck_name" id="foodtruck_name">
+                    </label>
+                    <label for="capacity">Food (contain)
+                        <input type="text" name="food" id="food">
+                    </label>
+                </div>
+                <br>
+                <input type="submit" name="filter" value="Filter">
+                <div style="text-align: -webkit-center; padding: 20px">
+                    <table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+                        <tr>
+                            <th>Station</th>
+                            <th>Building</th>
+                            <th>Food Truck(s)</th>
+                            <th>Food(s)</th>
+                        </tr>
+
+                            {% for explore in result %}
+                            <tr >
+                            <td style="word-break: break-word">
+                            <input type="radio" name ="station_select" id="station_select" value="{{explore.stationName}}">
+                            {{explore.stationName}}
+                            </td>
+                            <td style="word-break: break-word">{{explore.buildingName}}</td>
+                            <td style="word-break: break-word">{{explore.foodTruckNames}}</td>
+                            <td style="word-break: break-word">{{explore.foodNames}}</td>
+                            </tr>
+                            {% endfor %}
+                    </table>
+                </div>
+                <a href="{{ url_for('home') }}" class="button">Back</a>
+                <input type="submit"  name="select_location" value="Select As Current Location">
+                <br>
+                <div class="msg" style="padding: 10px">{{ msg }}</div>
+            </form>
+        </div>
+    </body>
+</html>

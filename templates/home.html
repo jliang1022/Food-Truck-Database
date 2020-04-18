@@ -10,12 +10,19 @@
 	<body>
 		<div class="home main">
 			<h1>Home</h1>
-            <input type="button" value="Explore" class="Customer">
-            <input type="button" value="View Order History" class="Customer">
-            <input type="button" value="Place Order" class="Customer">
-            <input type="button" value="View Current Information" class="Customer">
+            <a href="{{ url_for('customer_explore') }}">
+                <input type="button" value="Explore" class="Customer">
+            </a>
+            <a href="{{ url_for('cus_order_history') }}">
+                <input type="button" value="View Order History" class="Customer">
+            </a>
+            <a href="{{ url_for('current_information') }}">
+                <input type="button" value="View Current Information" class="Customer">
+            </a>
             <input type="button" value="Manage Food Truck" class="Manager">
-            <input type="button" value="View Food Truck Summary" class="Manager">
+            <a href="{{ url_for('foodtruck_summary') }}">
+                <input type="button" value="View Food Truck Summary" class="Manager">
+            </a>
             <a href="{{ url_for('manage_building_station') }}">
             	<input type="button" value="Manage Building & Station" class="Admin">
             </a>

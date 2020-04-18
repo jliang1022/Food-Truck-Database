@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Order History</title>
+        <meta charset="utf-8">
+            <title>Order History</title>
+            <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    </head>
+    <body>
+        <div class="register">
+        <center>
+            <h1>Order History</h1>
+        </center>
+        <table class="table table-striped"><tr><th>Date</th><th>OrderID</th><th>Order Total</th><th>Food(s)</th><th>Food Quantity</th></tr>
+
+        {% for history in history_list %}
+        <tr>
+        <td>{{history.date}}</td>
+        <td>{{history.orderID}}</td>
+        <td>{{history.orderTotal}}</td>
+        <td>{{history.foodNames}}</td>
+        <td>{{history.foodQuantity}}</td>
+        </tr>
+        {% endfor %}
+
+
+        </table>
+        <a href="{{ url_for('home') }}" class="button">Back</a>
+        </div>
+    </body>
+</html>
