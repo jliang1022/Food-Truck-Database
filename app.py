@@ -247,7 +247,7 @@ def manage_food_truck():
 			msg = 'Cannot delete selected food truck.'
 	if 'foodTruck_select' in request.form and 'update_foodTruck' in request.form:
 		foodTruck_select = request.form['foodTruck_select']
-		return redirect(url_for('updateFoodTruck', buildingName=building_select))		
+		return redirect(url_for('updateFoodTruck', foodTruckName=foodTruck_select))		
 	cursor.close()
 	return render_template('manage_food_truck.html', msg=msg, stations=stations, result=result)
 

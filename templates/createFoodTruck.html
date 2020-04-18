@@ -43,8 +43,7 @@
     <div class="updateFoodTruck main">
       <h1 class="h1main">Create Food Truck</h1>
         <div class="links">
-          <!-- needs to be manage food truck -->
-          <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
+          <a href="{{ url_for('manage_food_truck') }}" class="active">Back</a>
         </div>
       <!-- change to manage food truck -->
       <form action="{{ url_for('createFoodTruck') }}" method="post">
