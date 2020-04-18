@@ -407,7 +407,8 @@ def updateStation(stationName):
 		else:
 			msg = 'Capacity must be positive.'
 	cursor.close()
-	return render_template('updateStation.html', msg=msg, stationName=stationName, capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
+	return render_template('updateStation.html', msg=msg, stationName=stationName,
+		capacity=station['capacity'], sponsoredBuilding=station['buildingName'], buildings=buildings)
 
 @app.route('/createStation', methods=['GET', 'POST'])
 def createStation():
@@ -484,7 +485,6 @@ def updateBuilding(buildingName):
 			cursor.execute("SELECT * FROM Building WHERE buildingName = %s", [newName])
 			existingName = cursor.fetchone()
 			if existingName is not None:
-				print("here")
 				msg = "A building with this name already exists, pick a new name."
 				return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
 			else:
@@ -501,15 +501,14 @@ def updateBuilding(buildingName):
 				# don't do anything
 				continue
 			if tag not in tags and tag != '':
-				print("adding tag")
 				# add new tag
 				cursor.callproc('ad_add_building_tag', [newName, tag])
 				db_connection.commit()
 		for tag in tags:
 			if tag not in tagList:
-				print("deleting tag")
 				# delete tag
 				cursor.callproc('ad_remove_building_tag', [newName, tag])
+				db_connection.commit()
 
 	cursor.close()
 	return render_template('updateBuilding.html', msg=msg, buildingName=buildingName, description=description, tags=tags)
@@ -755,6 +754,133 @@ def cus_order_history():
 		history_list.append(order)
 
 	return render_template('orderhistory.html', history_list=history_list)
+
+@app.route('/updateFoodTruck/<foodTruckName>', methods=['GET', 'POST'])
+def updateFoodTruck(foodTruckName):
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT stationName FROM Station WHERE capacity > 0')
+	stations = [item['stationName'] for item in cursor.fetchall()]
+
+	#	get current station
+	cursor.execute('SELECT stationName FROM FoodTruck WHERE foodTruckName = %s', [foodTruckName])
+	station = cursor.fetchone()['stationName']
+
+	# get available staff
+	cursor.callproc('mn_view_foodTruck_available_staff', [session['username'], foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM mn_view_foodTruck_available_staff_result')
+	availableStaff = [item['availableStaff'] for item in cursor.fetchall()]
+
+	# get assigned staff
+	cursor.callproc('mn_view_foodTruck_staff', [foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * from mn_view_foodTruck_staff_result')
+	assignedStaff = [item['assignedStaff'] for item in cursor.fetchall()]
+
+	# get current menu
+	cursor.callproc('mn_view_foodTruck_menu', [foodTruckName])
+	db_connection.commit()
+	cursor.execute('SELECT * from mn_view_foodTruck_menu_result')
+	menu = cursor.fetchall()
+
+	# get food items not in current menu
+	cursor.execute("SELECT foodName from Food where foodName not in %s", [[item['foodName'] for item in menu]])
+	foods = [item['foodName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		newStation = request.form['station']
+		newStaffList = request.form.getlist('assignedStaff')
+		newMenuItems = request.form['addedFoods'].split('#')[:-1]
+		newCosts = request.form['addedPrices'].split('#')[:-1]
+
+		if station != newStation:
+			# change station 22a
+			cursor.callproc('mn_update_foodTruck_station', [foodTruckName, station])
+			db_connection.commit()
+
+		# assign new staff 22b
+		for staff in newStaffList:
+			cursor.execute("SELECT username FROM User WHERE firstName = %s AND lastName = %s", [staff.split(' ')[0], staff.split(' ')[1]])
+			username = cursor.fetchone()['username']
+			# newly assigned staff
+			if staff in availableStaff:
+
+				cursor.callproc('mn_update_foodTruck_staff', [foodTruckName, username])
+				db_connection.commit()
+
+		for staff in assignedStaff:
+			cursor.execute("SELECT username FROM User WHERE firstName = %s AND lastName = %s", [staff.split(' ')[0], staff.split(' ')[1]])
+			username = cursor.fetchone()['username']
+			# removed staff
+			if staff not in newStaffList:
+				cursor.callproc('mn_update_foodTruck_staff', [None, username])
+				db_connection.commit()
+
+		# add new menu items 22c
+		if len(newMenuItems) > 0:
+			for i in range(len(newMenuItems)):
+				cursor.callproc('mn_update_foodTruck_menu_item', [foodTruckName, float(newCosts[i]), newMenuItems[i]])
+				db_connection.commit()
+
+	return render_template('updateFoodTruck.html', msg=msg, foodTruckName=foodTruckName,
+		station=station, stations=stations, assignedStaff=assignedStaff,
+		availableStaff=availableStaff, menu=menu, foods=foods)
+
+@app.route('/createFoodTruck', methods=['GET', 'POST'])
+def createFoodTruck():
+	msg = ''
+	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT stationName FROM Station WHERE capacity > 0')
+	stations = [item['stationName'] for item in cursor.fetchall()]
+
+	# get available staff
+	cursor.callproc('mn_view_foodTruck_available_staff', [session['username'], None])
+	db_connection.commit()
+	cursor.execute('SELECT * FROM mn_view_foodTruck_available_staff_result')
+	availableStaff = [item['availableStaff'] for item in cursor.fetchall()]
+
+	# get food items
+	cursor.execute("SELECT foodName from Food")
+	foods = [item['foodName'] for item in cursor.fetchall()]
+
+	if request.method == "POST":
+		print(request.form)
+		foodTruckName = request.form['foodTruckName']
+		station = request.form['station']
+		staff = request.form.getlist('assignedStaff')
+
+		if request.form['addedFoods'] == '':
+			msg = "Add at least one menu item."
+			return render_template('createFoodTruck.html', msg=msg, availableStaff=availableStaff, foods=foods, stations=stations)
+
+		addedFoods = request.form['addedFoods'].split('#')[:-1]
+		prices = request.form['addedPrices'].split('#')[:-1]
+
+		# create food truck
+		cursor.execute("SELECT * FROM FoodTruck WHERE foodTruckName = %s", [foodTruckName])
+		existingName = cursor.fetchone()
+		if existingName is not None:
+			msg = "Food truck already exists. Pick a new name."
+			return render_template('createFoodTruck.html', msg=msg, availableStaff=availableStaff, foods=foods, stations=stations)
+
+		cursor.callproc('mn_create_foodTruck_add_station', [foodTruckName, station, session['username']])
+		db_connection.commit()
+
+		# add staff
+		for newStaff in staff:
+			# get username
+			cursor.execute("SELECT username FROM User WHERE firstName = %s AND lastName = %s", [newStaff.split(' ')[0], newStaff.split(' ')[1]])
+			username = cursor.fetchone()['username']
+			cursor.callproc('mn_create_foodTruck_add_staff', [foodTruckName, username])
+			db_connection.commit()
+
+		# create menu
+		for i in range(len(addedFoods)):
+			cursor.callproc('mn_create_foodTruck_add_menu_item', [foodTruckName, prices[i], addedFoods[i]])
+			db_connection.commit()
+
+	return render_template('createFoodTruck.html', msg=msg, availableStaff=availableStaff, foods=foods, stations=stations)
 
 if __name__ == '__main__':
 	app.run(debug=True)

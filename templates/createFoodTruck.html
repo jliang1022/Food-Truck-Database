@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Create Food Truck </title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        $('option.staff').mousedown(function(e) {
+          console.log($(this))
+          this.selected = !this.selected;
+          e.preventDefault();
+        });
+
+        $('input.Add').mousedown(function(e) {
+          console.log($(this))
+          var newFood = $('option.newFood:selected').val()
+          var toRemove = $('option.newFood:selected')
+          console.log(newFood)
+          var cost = $('input.newFoodCost').val()
+          console.log(cost)
+          if (newFood == undefined) {
+            alert("Pick a food from the list.")
+          }
+          else if (!$.isNumeric(cost) || cost <= 0) {
+            alert("Enter a positive dollar amount.")
+          }
+          else {
+            $('table.menuItemTable').append('<tr><td>' + newFood + '</td><td>' + cost + '</td></tr>')
+            toRemove.remove()
+            $('input.addedFoods').val($('input.addedFoods').val() + newFood + '#')
+            $('input.addedPrices').val($('input.addedPrices').val() + cost + '#')
+          }
+
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="updateFoodTruck main">
+      <h1 class="h1main">Create Food Truck</h1>
+        <div class="links">
+          <!-- needs to be manage food truck -->
+          <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
+        </div>
+      <!-- change to manage food truck -->
+      <form action="{{ url_for('createFoodTruck') }}" method="post">
+        <div>
+          <label for="foodTruckName">
+            Name
+          </label>
+          <input type="text" name="foodTruckName" id="foodTruckName" required>
+        </div>
+        <br>
+
+        <div>
+          <label for="station">
+            Station
+          </label>
+          <select name="station" required>
+            <option selected disabled hidden style='display: none' value=''></option>
+            {% for station in stations %}
+              <option value="{{ station }}">{{ station }}</option>
+            {% endfor %}
+        </select>
+        </div>
+        <br>
+
+        <div>
+          <label for="assignedStaff">
+            Assigned Staff:
+          </label>
+          <select name="assignedStaff" class="staff" multiple required>
+            {% for staff in availableStaff %}
+              <option class="staff" value="{{ staff }}">{{ staff }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <br>
+        <div>
+          <label for="menuItem">
+            Menu Item
+          </label>
+          <table class="menuItemTable" name="menuItemTable">
+            <tr>
+              <th>
+                Food
+              </th>
+              <th>
+                Price
+              </th>
+            </tr>
+          </table>
+        </div>
+        <br>
+        <div>
+          <label>
+            Add Item:
+          </label>
+          <select name="addMenuItem">
+            <option selected disabled hidden style='display: none' value=''></option>
+            {% for food in foods %}
+              <option class="newFood" value="{{ food }}">{{ food }}</option>
+            {% endfor%}
+          </select><br>
+          <label>
+            Price
+          </label>
+          <input type="text" name="price" class="newFoodCost">
+          <input type="button" class="Add" value="Add"/>
+        </div>
+        <div>
+          <input hidden type="textarea" name="addedFoods" class="addedFoods">
+          <input hidden type="textarea" name="addedPrices" class="addedPrices">
+        </div>
+
+        <div class="msg">{{ msg }}</div>
+        <input type="submit" name="update" value="Update">
+      </form>
+    </div>
+  </body>
+
+</html>
