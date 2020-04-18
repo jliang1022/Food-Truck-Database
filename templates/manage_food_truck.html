@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Manage Food Truck</title>
+		<meta charset="utf-8">
+			<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	</head>
+	<body>
+		<div class="manage_food_truck">
+			<h1>Manage Food Truck</h1>
+			<form action="{{ url_for('manage_food_truck') }}" method="post" autocomplete="off" style="text-align: center">
+				<div class="station_filter">
+					<label for="station_name">Station Name
+						<select name="station_name" method="GET" action="/manage_food_truck">
+							<option value = '' selected="selected"></option>
+							{% for station in stations %}
+								<option value="{{ station['stationName'] }}">{{ station['stationName'] }}</option>
+							{% endfor %}
+						</select>
+					</label>
+				</div>
+				<div class="food_truck_name_filter">
+					<label for="food_truck_name">Food Truck Name (contain)
+						<input type="text" name="food_truck_name" id="food_truck_name">
+					</label>
+				</div>
+				<div class="station_filter">
+					<label for="station_name">Has Remaining Capacity
+						<input type="checkbox" name="remaining" value="TRUE">
+					</label>
+				</div>
+				<div class="staff_filter">
+					<label for="staff">Staff Count
+						<input type="text" name="min_staff" placeholder="Min" id="min_staff">
+						<input type="text" name="max_staff" placeholder="Max" id="max_staff">
+					</label>
+				</div>
+				<br>
+				<input type="submit" name="filter" value="Filter">
+				<div style="text-align: -webkit-center; padding: 20px">
+					<table border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
+						<tr>
+							<th>Food Truck Name</th>
+							<th>Station Name</th>
+							<th>Remaining Capacity</th>
+							<th>Staff(s)</th>
+							<th># of Menu Items</th>
+						</tr>
+						{% for item in result %}
+						    <tr>
+						    {% for k, v in item.items() %}
+						    	{% if k == 'foodTruckName' %}
+						    		<td style="word-break: break-word"> 
+						    			<input type="radio" name ="foodTruck_select" id="foodTruck_select" value="{{ v }}">
+						    			{{v}} 
+						    		</td>
+						    	{% else %}
+						    		<td style="word-break: break-word"> {{v}} </td>
+						    	{% endif %}
+						    {% endfor %}
+						    </tr>
+						{% endfor %}
+					</table>
+				</div>
+				<a href="{{ url_for('home') }}" class="button">Back</a>
+				<a href="{{ url_for('create_building') }}" class="button">Create Food Truck</a>
+				<input type="submit"  name="update_foodTruck" value="Update Food Truck">
+				<input type="submit" name="delete_foodTruck" value="Delete Food Truck">
+				<br>
+				<div class="msg" style="padding: 10px">{{ msg }}</div>
+			</form>
+		</div>
+	</body>
+</html>
