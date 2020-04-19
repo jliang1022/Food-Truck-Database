@@ -8,11 +8,11 @@
             <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     </head>
     <body>
-        <div class="register">
+        <div class="order_history" style="text-align: center;">
         <center>
             <h1>Order History</h1>
         </center>
-        <table class="table table-striped"><tr><th>Date</th><th>OrderID</th><th>Order Total</th><th>Food(s)</th><th>Food Quantity</th></tr>
+        <table class="table table-striped" border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse;margin: inherit;"><tr><th>Date</th><th>OrderID</th><th>Order Total</th><th>Food(s)</th><th>Food Quantity</th></tr>
 
         {% for history in history_list %}
         <tr>

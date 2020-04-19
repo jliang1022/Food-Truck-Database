@@ -30,20 +30,21 @@
 					</div>
 					<br>
 					<div>
-						<div class="label">
-							<label for="building_tag">Tags</label>
-						</div>
+						
 						<div class="input">
 							<table id="tags" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
 								<tr>
 									<td>
+										<div class="label">
+											<label for="building_tag">Tags</label>
+										</div>
 										<input type="text" name="tag" class="Tag">
 									</td>
 									<td>
-										<input type="button" name="add_tag" value="Add" onclick="addRow()">
+										<input type="button" name="add_tag" value="Add" onclick="addRow()" style="margin-left: 0px; margin-right: 0px; margin-top: 0px; margin-bottom: 0px">
 									</td>
 									<td>
-										<input type="button" name="del_tag" value="Delete" onclick="deleteRow(this)">
+										<input type="button" name="del_tag" value="Delete" onclick="deleteRow(this)" style="margin-left: 0px; margin-right: 0px; margin-top: 0px; margin-bottom: 0px">
 									</td>
 								</tr>
 							</table>
@@ -74,7 +75,7 @@
 			function addRow() {
 				var tag = $('input.Tag').val();
 				if (tag != '') {
-					$('#tags').append('<tr><td>' + tag + '</td><td><input type="button"  name="del_tag" value="Delete" onclick="deleteRow(this)"></td></tr>');
+					$('#tags').append('<tr><td>' + tag + '</td><td><input type="button"  name="del_tag" value="Delete" onclick="deleteRow(this)" style="margin-left: 0px; margin-right: 0px; margin-top: 0px; margin-bottom: 0px"></td></tr>');
 					tags.push(tag);
 					console.log(tags)
 				}

@@ -15,14 +15,14 @@
       <!-- need to change to homescreen !!!!!! -->
         <a href="{{ url_for('home') }}" class="active">Back</a>
         <!-- filter food -->
-        <label for="foodName">Name:
+        <label for="foodName" style="margin-left: auto;">Name:
           <select name="filterFood">
             <option selected disabled hidden style='display: none' value=''></option>
             {% for item in allFoods %}
               <option value="{{ item.foodName }}">{{ item.foodName }}</option>
             {% endfor %}
           </select>
-          <input type="submit" name="filter" value="Filter">
+          <input type="submit" name="filter" value="Filter" style="margin-left: 10px">
         </label>
 
         <table class="manageFoodTable" border="1">

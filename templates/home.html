@@ -8,31 +8,31 @@
 			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	</head>
 	<body>
-		<div class="home main">
+		<div class="home main" style="text-align: center;">
 			<h1>Home</h1>
             <a href="{{ url_for('customer_explore') }}">
-                <input type="button" value="Explore" class="Customer">
+                <input type="button" value="Explore" class="Customer" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('cus_order_history') }}">
-                <input type="button" value="View Order History" class="Customer">
+                <input type="button" value="View Order History" class="Customer" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('current_information') }}">
-                <input type="button" value="View Current Information" class="Customer">
+                <input type="button" value="View Current Information" class="Customer" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('manage_food_truck')}}">
-            	<input type="button" value="Manage Food Truck" class="Manager">
+            	<input type="button" value="Manage Food Truck" class="Manager" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('foodtruck_summary') }}">
-                <input type="button" value="View Food Truck Summary" class="Manager">
+                <input type="button" value="View Food Truck Summary" class="Manager" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('manage_building_station') }}">
-            	<input type="button" value="Manage Building & Station" class="Admin">
+            	<input type="button" value="Manage Building & Station" class="Admin" style="margin-left: 0px" id="home">
             </a>
             <a href="{{ url_for('manageFood') }}">
-            	<input type="button" value="Manage Food" class="Admin">
+            	<input type="button" value="Manage Food" class="Admin" style="margin-left: 0px" id="home">
         	</a>
         	<a href="{{ url_for('logout') }}">
-            	<input type="button" value="Logout" class="All">
+            	<input type="button" value="Logout" class="All" style="margin-left: 0px" id="home">
         	</a>
 		</div>
 		<script type="text/javascript">

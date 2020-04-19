@@ -8,30 +8,34 @@
   </head>
 
   <body>
-    <div class="updateStation main">
+    <div class="updateStation main" style="text-align: center;">
       <h1 class="h1main">Update Station</h1>
-        <div class="links">
           <!-- needs to be home -->
           <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
-        </div>
       <form action="{{ url_for('updateStation', stationName=stationName) }}" method="post">
-        <label for="stationName">
-          Name
-        </label>
-        <input type="text" name="stationName" placeholder="{{ stationName }}" id="stationName" readonly>
-        <label for="capacity">
-          Capacity
-        </label>
-        <input type="text" name="capacity" id="capacity" value="{{ capacity }}" required>
-        <label for="sponsoredBuilding">
-          Sponsored Building:
-        </label>
-          <select name="sponsoredBuilding">
-            <option selected value="{{ sponsoredBuilding }}">{{ sponsoredBuilding }}</option>
-            {% for building in buildings %}
-              <option value="{{ building }}">{{ building }}</option>
-            {% endfor %}
-          </select>
+        <div>
+          <label for="stationName">
+            Name
+          </label>
+          <input type="text" name="stationName" placeholder="{{ stationName }}" id="stationName" readonly>
+        </div>
+        <div>
+          <label for="capacity">
+            Capacity
+          </label>
+          <input type="text" name="capacity" id="capacity" value="{{ capacity }}" required>
+        </div>
+        <div>
+          <label for="sponsoredBuilding">
+            Sponsored Building:
+          </label>
+            <select name="sponsoredBuilding">
+              <option selected value="{{ sponsoredBuilding }}">{{ sponsoredBuilding }}</option>
+              {% for building in buildings %}
+                <option value="{{ building }}">{{ building }}</option>
+              {% endfor %}
+            </select>
+          </div>
         <div class="msg">{{ msg }}</div>
         <input type="submit" name="update" value="Update">
       </form>

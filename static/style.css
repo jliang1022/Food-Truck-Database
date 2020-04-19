@@ -26,7 +26,7 @@ body {
     margin: 100px auto;
 }
 
-.manage_building_station, .create_building, .manage_food_truck {
+.manage_building_station, .create_building, .manage_food_truck, .order_history, .updateBuilding, .updateFoodTruck {
     width: 1000px;
     background-color: #ffffff;
     box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
@@ -90,15 +90,7 @@ h1 {
 .register form label[for='lastname'],
 .register form label[for='balance'],
 .register form label[for='role'],
-.createFood form label[for='foodName'],
-.updateStation form label[for='stationName'],
-.updateStation form label[for='capacity'],
-.createStation form label[for='stationName'],
-.createStation form label[for='capacity'],
-.createStation form label[for='sponsoredBuilding'],
-.updateBuilding form label[for='buildingName'],
-.updateBuilding form label[for='description'],
-.updateBuilding form label[for='tags'] {
+.createFood form label {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -124,9 +116,7 @@ h1 {
 .login form input[type="email"],
 .register form input[type="password"],
 .register form input[type="text"],
-.register form input[type="email"],
-.createFood form input[type="text"],
-.updateBuilding form input[type="text"] {
+.register form input[type="email"] {
     width: 310px;
     height: 50px;
     border: 1px solid #000000;
@@ -136,9 +126,8 @@ h1 {
 
 .updateBuilding form textarea {
     resize:vertical;
-    width: 310px;
+    width: 220px;
     height: 50px;
-    border: 1px solid #000000;
     margin-bottom: 20px;
     padding: 0 15px;
 }
@@ -147,13 +136,15 @@ h1 {
     vertical-align: middle;
 }
 
+.createStation form div,
+.updateBuilding form div,
+.updateStation form div
+.createFoodTruck form div {
+    margin: 10px;
+}
+
 .login form input[type="submit"],
-.register input[type="submit"],
-.createFood input[type="submit"],
-.manageFood input[type="submit"],
-.updateStation input[type="submit"],
-.createStation input[type="submit"],
-.updateBuilding input[type="submit"]{
+.register input[type="submit"] {
     width: 100%;
     padding: 15px;
     margin-top: 20px;
@@ -168,7 +159,6 @@ h1 {
 .login form input[type="submit"]:hover, 
 .register input[type="submit"]:hover,
 .home input:hover,
-.manageFood input[type="submit"]:hover,
 .manageFood input[type="submit"]:hover,
 .updateStation input[type="submit"]:hover,
 .createStation input[type="submit"]:hover,
@@ -222,7 +212,9 @@ h1 {
 a.button, 
 .manage_building_station form input[type="submit"],
 .create_building form input[type="submit"], 
-input[type="submit"] {
+input[type="submit"],
+input[type="button"]:not(#home),
+a.active:not([name="login"]) {
     background-color: #3274d6; /* Green */
     border: none;
     color: white;
@@ -240,7 +232,8 @@ input[type="submit"] {
 
 input[type="submit"]:hover,
 input[type="button"]:hover,
-a.button:hover {
+a.button:hover,
+a.active:hover {
     opacity: 0.5;
 }
 
@@ -248,9 +241,7 @@ a.button:hover {
     margin: 10px;
 }
 
-.createFood form input[type='text'],
-.updateStation form input[type='text'],
-.createStation form input[type='text']{
+.createFood form input[type='text'] {
     width: 310px;
     height: 50px;
     border: 1px solid #000000;

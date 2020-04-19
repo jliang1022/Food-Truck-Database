@@ -42,34 +42,40 @@
   </head>
 
   <body>
-    <div class="updateBuilding main">
+    <div class="updateBuilding main" style="text-align: center;">
       <h1 class="h1main">Update Building</h1>
-        <div class="links">
           <!-- needs to be home -->
           <a href="{{ url_for('manage_building_station') }}" class="active">Back</a>
-        </div>
       <form name="updateBuildingForm" action="{{ url_for('updateBuilding', buildingName=buildingName) }}" method="post">
-        <label for="buildingName">
-          Name
-        </label>
-        <input type="text" name="buildingName" value="{{ buildingName }}" id="buildingName"></input>
-        <label for="description">
-          Description
-        </label>
-        <textarea type="text" name="description" id="description" value="{{ description }}" required>{{ description }}</textarea>
-
-        <label for="tags">
-          Tags
-        </label>
-        <input name="tags" type="text"/>
-        <input type="button" name="add" value="Add" onclick="addValue();"/>
-        <select name="tagList" id="tagList" multiple>
-          {% for tag in tags %}
-            <option value="{{ tag }}">{{ tag }}</option>
-          {% endfor %}        </select>
-        <input type="button" name="delete" value="Delete" onclick="deleteValue();" />
+        <div style="margin-left: 400px; margin-right: 400px;">
+            <label for="buildingName" style="text-align: right">Name</label>
+          <input type="text" name="buildingName" value="{{ buildingName }}" id="buildingName"></input>
+        </div>
+        <br />
+        <div style="margin-left: 400px; margin-right: 400px;">
+            <label for="description">
+              Description
+            </label>
+          <div style="display: inline-block;
+    vertical-align: middle;">
+            <textarea type="text" name="description" id="description" value="{{ description }}" required>{{ description }}</textarea>
+          </div>
+        </div>
+        <br />
+        <div style="margin-left: 400px; margin-right: 400px;">
+          <label for="tags">
+            Tags
+          </label>
+          <input name="tags" type="text"/>
+          <input type="button" name="add" value="Add" onclick="addValue();"/>
+          <select name="tagList" id="tagList" multiple>
+            {% for tag in tags %}
+              <option value="{{ tag }}">{{ tag }}</option>
+            {% endfor %}        </select>
+        </div>
         <div class="msg">{{ msg }}</div>
-        <input type="button" name="huh" value="huh" onclick="submitChanges();" />
+        <br />
+        <input type="button" name="delete" value="Delete" onclick="deleteValue();" />
         <input type="submit" name="update" value="Update" onclick="submitChanges();" />
       </form>
     </div>

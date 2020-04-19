@@ -40,11 +40,9 @@
   </head>
 
   <body>
-    <div class="updateFoodTruck main">
+    <div class="updateFoodTruck main" style="text-align: center;">
       <h1 class="h1main">Update Food Truck</h1>
-        <div class="links">
           <a href="{{ url_for('manage_food_truck') }}" class="active">Back</a>
-        </div>
       <!-- change to manage food truck -->
       <form action="{{ url_for('updateFoodTruck', foodTruckName=foodTruckName) }}" method="post">
         <div>
@@ -82,11 +80,11 @@
           </select>
         </div>
         <br>
-        <div>
+        <div style="text-align: -webkit-center">
           <label for="menuItem">
             Menu Item
           </label>
-          <table class="menuItemTable" name="menuItemTable">
+          <table class="menuItemTable" name="menuItemTable" border="1" cellpadding="5" cellspacing="5" style="border-collapse: collapse; width: auto; margin: 20px">
             <tr>
               <th>
                 Food
@@ -117,7 +115,8 @@
           <label>
             Price
           </label>
-          <input type="text" name="price" class="newFoodCost">
+          <input type="text" name="price" class="newFoodCost" style="margin: 10px">
+          <br>
           <input type="button" class="Add" value="Add"/>
         </div>
         <div>
