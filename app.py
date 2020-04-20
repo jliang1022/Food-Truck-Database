@@ -13,7 +13,7 @@ app.secret_key = 'cs4400spring2020'
 #Trying to connect
 db_connection = MySQLdb.connect(host="127.0.0.1",
 						   user = "root",
-						   passwd = "Jl102298722321487",
+						   passwd = "cloud1515",
 						   db = "cs4400spring2020",
 						   port = 3306)
 # If connection is not successful
@@ -198,7 +198,7 @@ def manage_building_station():
 			station_result = cursor.fetchone()
 			return redirect(url_for('updateStation', stationName=station_result['stationName']))
 	cursor.close()
-	
+
 	return render_template('manage_building_station.html', msg=msg, buildings=buildings, stations=stations)
 
 @app.route('/manage_food_truck', methods=['GET', 'POST'])
@@ -759,7 +759,7 @@ def cus_order_history():
 def updateFoodTruck(foodTruckName):
 	msg = ''
 	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.execute('SELECT stationName FROM Station WHERE capacity > 0')
+	cursor.execute('select Station.stationName, (capacity - count(FoodTruck.foodTruckName)) as remainingCapacity from Station JOIN FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName having remainingCapacity > 0')
 	stations = [item['stationName'] for item in cursor.fetchall()]
 
 	#	get current station
@@ -831,7 +831,7 @@ def updateFoodTruck(foodTruckName):
 def createFoodTruck():
 	msg = ''
 	cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.execute('SELECT stationName FROM Station WHERE capacity > 0')
+	cursor.execute('select Station.stationName, (capacity - count(FoodTruck.foodTruckName)) as remainingCapacity from Station JOIN FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName having remainingCapacity > 0')
 	stations = [item['stationName'] for item in cursor.fetchall()]
 
 	# get available staff
